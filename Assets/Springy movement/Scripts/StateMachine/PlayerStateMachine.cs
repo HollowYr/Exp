@@ -1,0 +1,42 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Playables;
+
+public class PlayerStateMachine
+{
+    public IPlayerState[] states;
+    public PlayerStateAgent agent;
+    public PlayerStateID currentState;
+    public PlayerStateMachine(PlayerStateAgent agent)
+    {
+        this.agent = agent;
+
+        int numOfStates = System.Enum.GetNames(typeof(PlayerStateID)).Length;
+        states = new IPlayerState[numOfStates];
+    }
+
+    public void RegisterState(IPlayerState state)
+    {
+        int index = (int)state.GetID();
+        states[index] = state;
+    }
+
+    public IPlayerState GetState(PlayerStateID stateID)
+    {
+        int index = (int)stateID;
+        return states[index];
+    }
+
+    public void ChangeState(PlayerStateID newState)
+    {
+        GetState(currentState)?.Exit(agent);
+        currentState = newState;
+        GetState(currentState)?.Enter(agent);
+    }
+
+    public void Update()
+    {
+        GetState(currentState)?.Update(agent);
+    }
+}

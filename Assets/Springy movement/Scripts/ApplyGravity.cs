@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class ApplyGravity : MonoBehaviour
 {
+    [SerializeField] float gravityForce = 9.8f;
     private Rigidbody body;
-    public void SetRigidbody (Rigidbody rigidbody) => body = rigidbody; 
+    private void Start() => body = GetComponent<Rigidbody>(); 
     
-    // Update is called once per frame
     void Update()
     {
-        
+        body.velocity += Vector3.down * gravityForce;
     }
 }
