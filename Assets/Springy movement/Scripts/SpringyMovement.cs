@@ -16,10 +16,10 @@ public class SpringyMovement : MonoBehaviour
 
     private void Start() => springedRigidbody = GetComponent<Rigidbody>();
 
-    void Update()
+    void FixedUpdate()
     {
         Float();
-        RotationTorque();
+        //RotationTorque();
     }
 
     private void RotationTorque()
@@ -76,6 +76,6 @@ public class SpringyMovement : MonoBehaviour
             float springForce = (x * tension) - (relVel * rideSpringDamer);
             springedRigidbody.AddForce(rayDir * springForce, ForceMode.Acceleration);
         }
-        Debug.DrawLine(ray.origin, new Vector3(ray.origin.x, ray.origin.y - 100, ray.origin.z), hitDebugColor, Time.deltaTime);
+        Debug.DrawLine(ray.origin, new Vector3(ray.origin.x, ray.origin.y - 100, ray.origin.z), hitDebugColor, Time.fixedDeltaTime);
     }
 }

@@ -17,7 +17,6 @@ public class IkTest : MonoBehaviour
         animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
         animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
 
-        Debug.DrawLine(animator.GetIKPosition(AvatarIKGoal.LeftFoot) + Vector3.up, Vector3.down);
         Ray ray = new Ray(animator.GetIKPosition(AvatarIKGoal.LeftFoot) + Vector3.up, Vector3.down);
         if (Physics.Raycast(ray, out RaycastHit hit, IKDistanseToGround + 1f))
         {
