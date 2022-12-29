@@ -21,9 +21,9 @@ public class Movement : MonoBehaviour
         cameraTransform = Camera.main.transform;
 
         rigidbody = GetComponent<Rigidbody>();
-        isGrounded = GetComponent<IsGrounded>();
         spring = GetComponent<SpringyMovement>();
         gravity = GetComponent<ApplyGravity>();
+        isGrounded = GetComponent<IsGrounded>();
         isGrounded.onGroundedEvent += b =>
         {
             if (b)
@@ -42,13 +42,13 @@ public class Movement : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded.GetIsGrounded()) Jump();
-        DebugLegacy.DebugDrawLine(transform.position, transform.position + rigidbody.velocity, Color.green, 10);
+        //DebugLegacy.DebugDrawLine(transform.position, transform.position + rigidbody.velocity, Color.green, 10);
     }
 
-
+    public Transform GetMoldel() => rotationTransform;
     private void FixedUpdate()
     {
-        Move();
+        //Move();
     }
 
     private void Jump()

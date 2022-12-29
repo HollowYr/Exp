@@ -39,4 +39,9 @@ public class PlayerStateMachine
     {
         GetState(currentState)?.Update(agent);
     }
+
+    public void FixedUpdate()
+    {
+        GetState(currentState)?.FixedUpdate(agent);
+    }
 }

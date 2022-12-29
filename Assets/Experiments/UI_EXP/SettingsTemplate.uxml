@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Experiments/UI_EXP/MenuButton.uss?fileID=7433441132597879392&amp;guid=1d2534e7768507b4cb01dfc01f1c6ad6&amp;type=3#MenuButton" />
+    <ui:VisualElement name="Wrapper" style="flex-grow: 1;">
+        <ui:Button text="Setting A" display-tooltip-when-elided="true" class="menu-button" />
+        <ui:Button text="Setting B" display-tooltip-when-elided="true" class="menu-button" />
+        <ui:Button text="Setting C" display-tooltip-when-elided="true" class="menu-button" />
+        <ui:Button text="Back" display-tooltip-when-elided="true" name="BackButton" class="menu-button" />
+    </ui:VisualElement>
+</ui:UXML>

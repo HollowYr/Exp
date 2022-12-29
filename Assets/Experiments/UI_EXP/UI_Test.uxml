@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="ButtonsHolder" src="project://database/Assets/Experiments/UI_EXP/ButtonsHolder.uxml?fileID=9197481963319205126&amp;guid=49439ccbec5528247b1afb6fa250a2fc&amp;type=3#ButtonsHolder" />
+    <Style src="project://database/Assets/Experiments/UI_EXP/MenuButton.uss?fileID=7433441132597879392&amp;guid=1d2534e7768507b4cb01dfc01f1c6ad6&amp;type=3#MenuButton" />
+    <ui:VisualElement name="MainCanvas" style="flex-direction: row; flex-grow: 1;">
+        <ui:VisualElement name="LeftSection" style="height: 100%; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; border-top-left-radius: 0; border-bottom-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); width: 45%; margin-left: 5%; background-color: rgba(0, 0, 0, 0.35);">
+            <ui:Label text="MAIN MENU" display-tooltip-when-elided="true" name="MenuText" style="height: 20%; align-items: center; -unity-font: url(&apos;project://database/Assets/TextMesh%20Pro/Fonts/LiberationSans.ttf?fileID=12800000&amp;guid=e3265ab4bf004d28a9537516768c1c75&amp;type=3#LiberationSans&apos;); -unity-text-align: middle-center; font-size: 100%; -unity-font-style: bold; white-space: nowrap; color: rgb(191, 191, 191); padding-left: 0; padding-right: 0; padding-top: 10px; padding-bottom: 0;" />
+            <ui:Instance template="ButtonsHolder" name="ButtonsHolder" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="RightSection" style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>

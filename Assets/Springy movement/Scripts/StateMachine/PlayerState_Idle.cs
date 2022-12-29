@@ -16,12 +16,18 @@ public class PlayerState_Idle : IPlayerState
     }
     public void Update(PlayerStateAgent agent)
     {
-
+        float horizontal = Mathf.Abs(Input.GetAxis("Horizontal"));
+        float vertical = Mathf.Abs(Input.GetAxis("Vertical"));
+        if (horizontal > 0 || vertical > 0) agent.stateMachine.ChangeState(PlayerStateID.Walk);
     }
 
+
+    public void FixedUpdate(PlayerStateAgent agent)
+    {
+
+    }
     public void Exit(PlayerStateAgent agent)
     {
         Debug.Log("Exit: " + System.Enum.GetName(typeof(PlayerStateID), GetID()));
-
     }
 }

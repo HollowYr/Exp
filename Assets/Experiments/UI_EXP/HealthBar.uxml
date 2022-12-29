@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Background" focusable="false" style="flex-grow: 1; flex-direction: row;">
+        <ui:ProgressBar title="${low-value/high-value}" name="HealthBar" low-value="0" high-value="100" class="ProgressBar" style="flex-basis: 500px; flex-direction: row; width: 100%; height: 10%; justify-content: flex-start; align-items: center; visibility: visible; -unity-text-align: middle-center; white-space: normal; font-size: 30px; flex-shrink: 1; flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>
