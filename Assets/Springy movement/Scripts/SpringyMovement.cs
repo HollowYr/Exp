@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpringyMovement : MonoBehaviour
+public class SpringyMovement : ImprovedMonoBehaviour
 {
     [SerializeField] private float desiredFloatHeight = 1.5f;
     [SerializeField] private float uprightSpringStrength = 50f;

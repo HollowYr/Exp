@@ -19,13 +19,13 @@ public class PlayerState_Walk : IPlayerState
 
     public virtual void Enter(PlayerStateAgent agent)
     {
-        rigidbody = agent.rb;
+        rigidbody = agent.rigidbody;
         cameraTransform = agent.cameraTransform;
         movementSpeed = agent.movementData.movementSpeed;
         rotationTransform = agent.playerModel;
         rotationSpeed = agent.movementData.rotationSpeed;
-        Debug.Log("Enter: " + System.Enum.GetName(typeof(PlayerStateID), GetID()));
 
+        Debug.Log($"Enter: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
     }
     public virtual void Update(PlayerStateAgent agent)
     {
@@ -42,7 +42,7 @@ public class PlayerState_Walk : IPlayerState
     public virtual void Exit(PlayerStateAgent agent)
     {
         Move();
-        //Debug.Log("Exit: " + System.Enum.GetName(typeof(PlayerStateID), GetID()));
+        Debug.Log($"Exit: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
     }
 
     private void Move()
@@ -73,4 +73,7 @@ public class PlayerState_Walk : IPlayerState
                                                               rotationSpeed * Time.fixedDeltaTime);
     }
 
+    public virtual void OnDrawGizmos()
+    {
+    }
 }

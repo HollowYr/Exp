@@ -16,3 +16,9 @@ MonoBehaviour:
   jumpForceMode: 1
   movementSpeed: 5.847449
   rotationSpeed: 720
+  distanceToWall: 1.5
+  stickToWallPower: 200
+  maxTime: 5
+  additionalSpeed: 0
+  layerWall: 6
+  playerRadius: 0.3

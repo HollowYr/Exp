@@ -10,18 +10,20 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
     [SerializeField] internal MovementData movementData;
     [SerializeField] internal PlayerStateMachine stateMachine;
     [SerializeField] private PlayerStateID initialState;
-    internal Rigidbody rb;
+
+    internal Rigidbody rigidbody;
     private IsGrounded isGrounded;
-    private bool isGroundedState = false;
+    internal bool isGroundedState = false;
     void Start()
     {
         stateMachine = new PlayerStateMachine(this);
         stateMachine.RegisterState(new PlayerState_Idle());
         stateMachine.RegisterState(new PlayerState_InAir());
         stateMachine.RegisterState(new PlayerState_Walk());
+        stateMachine.RegisterState(new PlayerState_Wallrun());
         stateMachine.ChangeState(initialState);
 
-        rb = GetComponent<Rigidbody>();
+        rigidbody = GetComponent<Rigidbody>();
         isGrounded = GetComponent<IsGrounded>();
         isGrounded.onGroundedEvent += b =>
         {
@@ -41,14 +43,19 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
 
     private void Jump()
     {
-        rb.AddForce(Vector3.up * movementData.jumpForce, movementData.jumpForceMode);
+        rigidbody.AddForce(Vector3.up * movementData.jumpForce, movementData.jumpForceMode);
         isGrounded.onGroundedEvent?.Invoke(false);
     }
-
 
     private void FixedUpdate()
     {
         if (stateMachine == null) return;
         stateMachine.FixedUpdate();
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (stateMachine == null) return;
+        stateMachine.OnDrawGizmos();
     }
 }

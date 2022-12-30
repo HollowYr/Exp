@@ -56,7 +56,6 @@ public class Wallrun : MonoBehaviour
             DebugLegacy.DebugDrawLine(transform.position, transform.position + force, Color.green, 10f);
             Debug.DrawLine(hit.point, hit.point + hit.normal, Color.green, Time.deltaTime);
         }
-
     }
 
     private void FixedUpdate()

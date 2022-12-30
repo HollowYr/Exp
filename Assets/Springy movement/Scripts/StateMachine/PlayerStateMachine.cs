@@ -44,4 +44,9 @@ public class PlayerStateMachine
     {
         GetState(currentState)?.FixedUpdate(agent);
     }
+
+    public void OnDrawGizmos()
+    {
+        GetState(currentState)?.OnDrawGizmos();
+    }
 }

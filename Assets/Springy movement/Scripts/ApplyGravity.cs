@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ApplyGravity : MonoBehaviour
+public class ApplyGravity : ImprovedMonoBehaviour
 {
     [SerializeField] float gravityForce = 9.8f;
     private Rigidbody body;

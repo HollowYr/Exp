@@ -9,4 +9,5 @@ public interface IPlayerState
     public void Update(PlayerStateAgent agent);
     public void FixedUpdate(PlayerStateAgent agent);
     public void Exit(PlayerStateAgent agent);
+    public void OnDrawGizmos();
 }
