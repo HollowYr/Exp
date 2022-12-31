@@ -60,17 +60,8 @@ public class PlayerState_Walk : IPlayerState
         rigidbody.velocity = (new Vector3(0, rigidbody.velocity.y, 0) +
                                 movementDirection * movementSpeed);
 
-        if (movementDirection == Vector3.zero) return;
 
-        Quaternion LookAtRotation = Quaternion.LookRotation(movementDirection);
-
-        Quaternion LookAtRotationOnly_Y = Quaternion.Euler(rotationTransform.rotation.eulerAngles.x,
-                                                           LookAtRotation.eulerAngles.y,
-                                                           rotationTransform.rotation.eulerAngles.z);
-
-        rotationTransform.rotation = Quaternion.RotateTowards(rotationTransform.rotation,
-                                                              LookAtRotationOnly_Y,
-                                                              rotationSpeed * Time.fixedDeltaTime);
+        rotationTransform.RotateInDirectionOnYAxis(movementDirection, rotationSpeed);
     }
 
     public virtual void OnDrawGizmos()

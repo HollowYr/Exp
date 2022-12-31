@@ -21,4 +21,4 @@ MonoBehaviour:
   maxTime: 5
   additionalSpeed: 0
   layerWall: 6
-  playerRadius: 0.3
+  playerRadius: 0.45
