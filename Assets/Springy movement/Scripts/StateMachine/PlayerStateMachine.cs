@@ -31,8 +31,9 @@ public class PlayerStateMachine
     public void ChangeState(PlayerStateID newState)
     {
         GetState(currentState)?.Exit(agent);
+        PlayerStateID previousState = currentState;
         currentState = newState;
-        GetState(currentState)?.Enter(agent);
+        GetState(currentState)?.Enter(agent, previousState);
     }
 
     public void Update()

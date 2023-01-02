@@ -8,12 +8,12 @@ public class PlayerState_Wallrun : IPlayerState
 {
     private Rigidbody rigidbody;
     private Transform playerModel;
-    private Transform playerTransform;
     private float distanceToWall;
     private float stickToWallPower;
     private float maxTime;
     private float timer;
     private float additionalSpeed;
+    private float speed;
     private float rotationSpeed;
     private Vector3 force;
     private Vector3 rotateToWallDirection;
@@ -21,18 +21,17 @@ public class PlayerState_Wallrun : IPlayerState
 
     public PlayerStateID GetID() => PlayerStateID.Wallrun;
 
-    public void Enter(PlayerStateAgent agent)
+    public void Enter(PlayerStateAgent agent, PlayerStateID previousState)
     {
         rigidbody = agent.rigidbody;
         playerModel = agent.playerModel;
         distanceToWall = agent.movementData.distanceToWall;
-        layerWall = agent.movementData.layerWall;
-        playerTransform = agent.transform;
+        layerWall = 1 << agent.movementData.layerWall;
         stickToWallPower = agent.movementData.stickToWallPower;
         maxTime = agent.movementData.maxTime;
         additionalSpeed = agent.movementData.additionalSpeed;
         rotationSpeed = agent.movementData.rotationSpeed;
-
+        speed = agent.movementData.movementSpeed;
         timer = 0;
 
         LockPositionConstraintY();
@@ -46,10 +45,10 @@ public class PlayerState_Wallrun : IPlayerState
         Ray diagonalRight = new Ray(playerModel.position, playerModel.right + playerModel.forward);
         Ray diagonalLeft = new Ray(playerModel.position, -playerModel.right + playerModel.forward);
 
-        if (Physics.Raycast(rayRight, out RaycastHit hit, distanceToWall, ~layerWall) ||
-            Physics.Raycast(rayLeft, out hit, distanceToWall, ~layerWall) ||
-            Physics.Raycast(diagonalRight, out hit, distanceToWall, ~layerWall) ||
-            Physics.Raycast(diagonalLeft, out hit, distanceToWall, ~layerWall))
+        if (Physics.Raycast(rayRight, out RaycastHit hit, distanceToWall, layerWall) ||
+            Physics.Raycast(rayLeft, out hit, distanceToWall, layerWall) ||
+            Physics.Raycast(diagonalRight, out hit, distanceToWall, layerWall) ||
+            Physics.Raycast(diagonalLeft, out hit, distanceToWall, layerWall))
         {
             force = (hit.point - (hit.point + hit.normal)) * stickToWallPower * Time.fixedDeltaTime;
             timer += Time.deltaTime;
@@ -63,9 +62,8 @@ public class PlayerState_Wallrun : IPlayerState
 
     public void FixedUpdate(PlayerStateAgent agent)
     {
-        if (timer > maxTime || Input.GetAxis("Vertical") <= 0)
+        if (timer > maxTime || UnityLegacy.InputVertical() <= 0)
         {
-            ResetConstraints();
             agent.stateMachine.ChangeState(PlayerStateID.InAir);
             return;
         }
@@ -77,8 +75,8 @@ public class PlayerState_Wallrun : IPlayerState
             playerModel.RotateInDirectionOnYAxis(rotateToWallDirection, rotationSpeed * 10f);
             //Debug.Break();
         }
-        Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")).normalized;
-        rigidbody.velocity += force * input.y + playerModel.right * input.x + playerModel.forward * input.y * additionalSpeed;
+        float input = Mathf.CeilToInt(UnityLegacy.InputVertical());
+        rigidbody.velocity = force * input + playerModel.forward * input * (speed + additionalSpeed);
         rotateToWallDirection = Vector3.zero;
     }
 

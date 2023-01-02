@@ -17,7 +17,7 @@ public class PlayerState_Walk : IPlayerState
         return PlayerStateID.Walk;
     }
 
-    public virtual void Enter(PlayerStateAgent agent)
+    public virtual void Enter(PlayerStateAgent agent, PlayerStateID previousState)
     {
         rigidbody = agent.rigidbody;
         cameraTransform = agent.cameraTransform;
