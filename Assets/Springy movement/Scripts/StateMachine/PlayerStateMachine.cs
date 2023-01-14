@@ -5,9 +5,9 @@ using UnityEngine.Playables;
 
 public class PlayerStateMachine
 {
-    public IPlayerState[] states;
-    public PlayerStateAgent agent;
-    public PlayerStateID currentState;
+    private IPlayerState[] states;
+    private PlayerStateAgent agent;
+    private PlayerStateID currentState;
     public PlayerStateMachine(PlayerStateAgent agent)
     {
         this.agent = agent;
@@ -15,6 +15,8 @@ public class PlayerStateMachine
         int numOfStates = System.Enum.GetNames(typeof(PlayerStateID)).Length;
         states = new IPlayerState[numOfStates];
     }
+
+    public PlayerStateID GetCurrentState() => currentState;
 
     public void RegisterState(IPlayerState state)
     {

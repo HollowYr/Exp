@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Springy%20movement/UI/DebugText.uss?fileID=7433441132597879392&amp;guid=1008d5f1e24f69241b09d7a238e77f1a&amp;type=3#DebugText" />
+    <ui:VisualElement name="Background" style="flex-grow: 1; flex-direction: row;">
+        <ui:VisualElement style="flex-grow: 0; height: 100%; width: 25%; flex-direction: column-reverse; background-color: rgba(0, 0, 0, 0);">
+            <ui:Label text="Label" display-tooltip-when-elided="true" name="Speed" class="debugText" />
+            <ui:Label text="Label" display-tooltip-when-elided="true" name="State" class="debugText" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

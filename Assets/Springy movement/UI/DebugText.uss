@@ -1,0 +1,19 @@
+.debugText {
+    font-size: 75px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    align-items: stretch;
+    justify-content: flex-start;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    transition-duration: 0.2s;
+    position: relative;
+    color: rgb(207, 207, 207);
+    padding-left: 10px;
+    padding-bottom: 10px;
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+}

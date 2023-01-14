@@ -24,8 +24,6 @@ public class PlayerState_Walk : IPlayerState
         movementSpeed = agent.movementData.movementSpeed;
         rotationTransform = agent.playerModel;
         rotationSpeed = agent.movementData.rotationSpeed;
-
-        Debug.Log($"Enter: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
     }
     public virtual void Update(PlayerStateAgent agent)
     {
@@ -34,16 +32,9 @@ public class PlayerState_Walk : IPlayerState
 
         if (horizontal == 0 && vertical == 0) agent.stateMachine.ChangeState(PlayerStateID.Idle);
     }
-    public virtual void FixedUpdate(PlayerStateAgent agent)
-    {
-        Move();
-    }
+    public virtual void FixedUpdate(PlayerStateAgent agent) => Move();
 
-    public virtual void Exit(PlayerStateAgent agent)
-    {
-        Move();
-        Debug.Log($"Exit: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
-    }
+    public virtual void Exit(PlayerStateAgent agent) => Move();
 
     private void Move()
     {
@@ -64,7 +55,5 @@ public class PlayerState_Walk : IPlayerState
         rotationTransform.RotateInDirectionOnYAxis(movementDirection, rotationSpeed);
     }
 
-    public virtual void OnDrawGizmos()
-    {
-    }
+    public virtual void OnDrawGizmos() { }
 }

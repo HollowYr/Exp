@@ -1,4 +1,5 @@
 #define DEBUG
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,12 +13,16 @@ public class PlayerState_Wallrun : IPlayerState
     private float stickToWallPower;
     private float maxTime;
     private float timer;
-    private float additionalSpeed;
     private float speed;
+    private float additionalSpeed;
     private float rotationSpeed;
+    private float wallMaxAngleDifference;
     private Vector3 force;
     private Vector3 rotateToWallDirection;
     private int layerWall;
+    private bool isSnapFinished = false;
+
+    private Vector3 previousNormal;
 
     public PlayerStateID GetID() => PlayerStateID.Wallrun;
 
@@ -32,14 +37,29 @@ public class PlayerState_Wallrun : IPlayerState
         additionalSpeed = agent.movementData.additionalSpeed;
         rotationSpeed = agent.movementData.rotationSpeed;
         speed = agent.movementData.movementSpeed;
+        wallMaxAngleDifference = agent.movementData.wallSnapMaxAngle;
         timer = 0;
 
         LockPositionConstraintY();
-        Debug.Log($"Enter: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
+
+        Vector3 wallDestination = Vector3.zero;
+        Ray rayRight = new Ray(playerModel.position, playerModel.right);
+        Ray rayLeft = new Ray(playerModel.position, -playerModel.right);
+
+        if (!Physics.Raycast(rayRight, out RaycastHit hit, distanceToWall, layerWall) &&
+            !Physics.Raycast(rayLeft, out hit, distanceToWall, layerWall))
+            return;
+
+        previousNormal = hit.normal;
+        wallDestination = hit.point + (playerModel.position - hit.point).normalized * agent.movementData.playerRadius;
+        wallDestination -= playerModel.localPosition;
+        agent.transform.DOMove(wallDestination, agent.movementData.wallSnapTime)
+            .OnComplete(() => isSnapFinished = true);
     }
 
     public void Update(PlayerStateAgent agent)
     {
+        if (!isSnapFinished) return;
         Ray rayRight = new Ray(playerModel.position, playerModel.right);
         Ray rayLeft = new Ray(playerModel.position, -playerModel.right);
         Ray diagonalRight = new Ray(playerModel.position, playerModel.right + playerModel.forward);
@@ -53,6 +73,11 @@ public class PlayerState_Wallrun : IPlayerState
             force = (hit.point - (hit.point + hit.normal)) * stickToWallPower * Time.fixedDeltaTime;
             timer += Time.deltaTime;
             rotateToWallDirection = Vector3.Cross(hit.normal, Vector3.up);
+
+            if (Vector3.Angle(previousNormal, hit.normal) > wallMaxAngleDifference)
+                agent.stateMachine.ChangeState(PlayerStateID.InAir);
+
+            previousNormal = hit.normal;
         }
         else
         {
@@ -62,6 +87,8 @@ public class PlayerState_Wallrun : IPlayerState
 
     public void FixedUpdate(PlayerStateAgent agent)
     {
+        if (!isSnapFinished) return;
+
         if (timer > maxTime || UnityLegacy.InputVertical() <= 0)
         {
             agent.stateMachine.ChangeState(PlayerStateID.InAir);
@@ -73,18 +100,13 @@ public class PlayerState_Wallrun : IPlayerState
             if ((playerModel.forward - rotateToWallDirection).magnitude > (playerModel.forward - -rotateToWallDirection).magnitude)
                 rotateToWallDirection = -rotateToWallDirection;
             playerModel.RotateInDirectionOnYAxis(rotateToWallDirection, rotationSpeed * 10f);
-            //Debug.Break();
         }
         float input = Mathf.CeilToInt(UnityLegacy.InputVertical());
         rigidbody.velocity = force * input + playerModel.forward * input * (speed + additionalSpeed);
         rotateToWallDirection = Vector3.zero;
     }
 
-    public void Exit(PlayerStateAgent agent)
-    {
-        ResetConstraints();
-        Debug.Log($"Exit: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
-    }
+    public void Exit(PlayerStateAgent agent) => ResetConstraints();
 
     private void LockPositionConstraintY()
     {
@@ -96,9 +118,7 @@ public class PlayerState_Wallrun : IPlayerState
 
     private void ResetConstraints()
     {
-        rigidbody.constraints = RigidbodyConstraints.None;
-        rigidbody.constraints =
-                                RigidbodyConstraints.FreezeRotationX |
+        rigidbody.constraints = RigidbodyConstraints.FreezeRotationX |
                                 RigidbodyConstraints.FreezeRotationY |
                                 RigidbodyConstraints.FreezeRotationZ;
     }

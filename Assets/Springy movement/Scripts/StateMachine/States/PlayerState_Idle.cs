@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerState_Idle : IPlayerState
 {
     public PlayerStateID GetID() => PlayerStateID.Idle;
-    public void Enter(PlayerStateAgent agent, PlayerStateID previousState) => Debug.Log($"Enter: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
+    public void Enter(PlayerStateAgent agent, PlayerStateID previousState) { }
     public void Update(PlayerStateAgent agent)
     {
         float horizontal = Mathf.Abs(Input.GetAxis("Horizontal"));
@@ -18,7 +18,7 @@ public class PlayerState_Idle : IPlayerState
     {
 
     }
-    public void Exit(PlayerStateAgent agent) => Debug.Log($"Exit: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
+    public void Exit(PlayerStateAgent agent) { }
 
     public void OnDrawGizmos()
     {
