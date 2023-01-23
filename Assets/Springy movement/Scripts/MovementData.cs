@@ -15,6 +15,7 @@ public class MovementData : ScriptableObject
     [Foldout("Wallrun"), SerializeField] internal float additionalSpeed = 50f;
     [Foldout("Wallrun"), SerializeField] internal float wallSnapTime = .15f;
     [Foldout("Wallrun"), SerializeField] internal float wallSnapMaxAngle = 30f;
+    [Foldout("Wallrun"), SerializeField] internal float delayToNextWall = .2f;
     [Foldout("Wallrun"), SerializeField, Layer] internal int layerWall;
 
     [Foldout("Player"), SerializeField] internal float playerRadius = 1f;

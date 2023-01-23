@@ -9,6 +9,8 @@ public class PlayerState_InAir : PlayerState_Walk
 {
     private Transform playerModel;
     private float distanceToWall;
+    private float delayToNextWall;
+    private bool delayPassed = false;
     private int layerWall;
     private PlayerStateID previousState;
 
@@ -21,16 +23,25 @@ public class PlayerState_InAir : PlayerState_Walk
         playerModel = agent.playerModel;
         distanceToWall = agent.movementData.distanceToWall;
         layerWall = 1 << agent.movementData.layerWall;
+        delayToNextWall = agent.movementData.delayToNextWall;
+        delayPassed = false;
+        if (previousState == PlayerStateID.Wallrun)
+        {
+            agent.DoAfterTime(delayToNextWall, () => delayPassed = true);
+        }
+        else
+        {
+            delayPassed = true;
+        }
         //Debug.Log($"Enter: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
     }
-
 
     Vector3 wallDestination;
     public override void Update(PlayerStateAgent agent)
     {
         base.Update(agent);
 
-        if (UnityLegacy.InputVertical() <= 0 || previousState == PlayerStateID.Wallrun) return;
+        if (UnityLegacy.InputVertical() <= 0 || !delayPassed) return;
         wallDestination = Vector3.zero;
         Ray rayRight = new Ray(playerModel.position, playerModel.right);
         Ray rayLeft = new Ray(playerModel.position, -playerModel.right);
@@ -43,10 +54,6 @@ public class PlayerState_InAir : PlayerState_Walk
             !Physics.Raycast(rayLeft, out hit, distanceToWall, layerWall))
             return;
 
-
-        //wallDestination = hit.point + (playerModel.position - hit.point).normalized * agent.movementData.playerRadius;
-        //wallDestination -= playerModel.localPosition;
-        //agent.transform.DOMove(wallDestination, 0f).OnComplete(() => { });
         agent.stateMachine.ChangeState(PlayerStateID.Wallrun);
     }
 
@@ -54,7 +61,6 @@ public class PlayerState_InAir : PlayerState_Walk
     {
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(wallDestination, .1f);
-
     }
 }
 

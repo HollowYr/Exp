@@ -1,8 +1,10 @@
 #define DEBUG
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 
 public class PlayerState_Wallrun : IPlayerState
@@ -60,6 +62,14 @@ public class PlayerState_Wallrun : IPlayerState
     public void Update(PlayerStateAgent agent)
     {
         if (!isSnapFinished) return;
+
+        if (UnityLegacy.InputJump())
+        {
+            Jump(agent);
+            return;
+        }
+
+
         Ray rayRight = new Ray(playerModel.position, playerModel.right);
         Ray rayLeft = new Ray(playerModel.position, -playerModel.right);
         Ray diagonalRight = new Ray(playerModel.position, playerModel.right + playerModel.forward);
@@ -75,15 +85,16 @@ public class PlayerState_Wallrun : IPlayerState
             rotateToWallDirection = Vector3.Cross(hit.normal, Vector3.up);
 
             if (Vector3.Angle(previousNormal, hit.normal) > wallMaxAngleDifference)
-                agent.stateMachine.ChangeState(PlayerStateID.InAir);
+                ChangeStateToInAir(agent);
 
             previousNormal = hit.normal;
         }
         else
         {
-            agent.stateMachine.ChangeState(PlayerStateID.InAir);
+            ChangeStateToInAir(agent);
         }
     }
+
 
     public void FixedUpdate(PlayerStateAgent agent)
     {
@@ -91,7 +102,7 @@ public class PlayerState_Wallrun : IPlayerState
 
         if (timer > maxTime || UnityLegacy.InputVertical() <= 0)
         {
-            agent.stateMachine.ChangeState(PlayerStateID.InAir);
+            ChangeStateToInAir(agent);
             return;
         }
 
@@ -106,8 +117,20 @@ public class PlayerState_Wallrun : IPlayerState
         rotateToWallDirection = Vector3.zero;
     }
 
-    public void Exit(PlayerStateAgent agent) => ResetConstraints();
+    private static void ChangeStateToInAir(PlayerStateAgent agent) =>
+        agent.stateMachine.ChangeState(PlayerStateID.InAir);
 
+    public void Exit(PlayerStateAgent agent) => ResetConstraints();
+    private void Jump(PlayerStateAgent agent)
+    {
+        Vector3 movementDirection = agent.GetPlayerMovementDirection();
+        movementDirection.y = 1;
+        movementDirection = movementDirection.normalized;
+        //Debug.Break();
+        agent.Jump(movementDirection);
+        ChangeStateToInAir(agent);
+
+    }
     private void LockPositionConstraintY()
     {
         rigidbody.constraints = RigidbodyConstraints.FreezeRotationX |

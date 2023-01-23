@@ -12,11 +12,7 @@ public class PlayerState_Walk : IPlayerState
     float horizontal;
     float vertical;
 
-    public virtual PlayerStateID GetID()
-    {
-        return PlayerStateID.Walk;
-    }
-
+    public virtual PlayerStateID GetID() => PlayerStateID.Walk;
     public virtual void Enter(PlayerStateAgent agent, PlayerStateID previousState)
     {
         rigidbody = agent.rigidbody;
@@ -27,30 +23,23 @@ public class PlayerState_Walk : IPlayerState
     }
     public virtual void Update(PlayerStateAgent agent)
     {
-        horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical");
+        horizontal = UnityLegacy.InputHorizontal();
+        vertical = UnityLegacy.InputVertical();
+
+        if (UnityLegacy.InputJump() && agent.GetIsGrounded()) agent.Jump();
 
         if (horizontal == 0 && vertical == 0) agent.stateMachine.ChangeState(PlayerStateID.Idle);
     }
-    public virtual void FixedUpdate(PlayerStateAgent agent) => Move();
+    public virtual void FixedUpdate(PlayerStateAgent agent) => Move(agent);
 
-    public virtual void Exit(PlayerStateAgent agent) => Move();
+    public virtual void Exit(PlayerStateAgent agent) => Move(agent);
 
-    private void Move()
+    private void Move(PlayerStateAgent agent)
     {
-        Vector3 cameraForward = cameraTransform.forward;
-        cameraForward.y = 0;
-        cameraForward = cameraForward.normalized;
-
-        Vector3 cameraRight = cameraTransform.right;
-        cameraRight.y = 0;
-        cameraRight = cameraRight.normalized;
-        Vector3 movementDirection = vertical * cameraForward + horizontal * cameraRight;
-        movementDirection = movementDirection.normalized;
+        Vector3 movementDirection = agent.GetPlayerMovementDirection();
 
         rigidbody.velocity = (new Vector3(0, rigidbody.velocity.y, 0) +
                                 movementDirection * movementSpeed);
-
 
         rotationTransform.RotateInDirectionOnYAxis(movementDirection, rotationSpeed);
     }

@@ -21,5 +21,7 @@ MonoBehaviour:
   maxTime: 5
   additionalSpeed: 0
   wallSnapTime: 0.15
+  wallSnapMaxAngle: 30
+  delayToNextWall: 0.5
   layerWall: 6
   playerRadius: 0.45
