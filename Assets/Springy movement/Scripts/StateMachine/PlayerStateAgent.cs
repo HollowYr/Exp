@@ -14,6 +14,7 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
     internal Rigidbody rigidbody;
     private IsGrounded isGrounded;
     internal bool isGroundedState = false;
+    internal bool allowGroundedStateChange = true;
     private void Start()
     {
         stateMachine = new PlayerStateMachine(this);
@@ -21,6 +22,7 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
         stateMachine.RegisterState(new PlayerState_InAir());
         stateMachine.RegisterState(new PlayerState_Walk());
         stateMachine.RegisterState(new PlayerState_Wallrun());
+        stateMachine.RegisterState(new PlayerState_RailGrind());
         stateMachine.ChangeState(initialState);
 
         rigidbody = GetComponent<Rigidbody>();
@@ -30,6 +32,8 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
             if (isGroundedState == b) return;
 
             isGroundedState = b;
+            if (allowGroundedStateChange == false) return;
+
             stateMachine.ChangeState((b) ? PlayerStateID.Idle : PlayerStateID.InAir);
         };
     }

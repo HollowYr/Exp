@@ -9,17 +9,20 @@ public class PlayerState_Walk : IPlayerState
     private Transform rotationTransform;
     private float movementSpeed;
     private float rotationSpeed;
-    float horizontal;
-    float vertical;
-
+    private float horizontal;
+    private float vertical;
+    private bool isFirstStart = true;
     public virtual PlayerStateID GetID() => PlayerStateID.Walk;
     public virtual void Enter(PlayerStateAgent agent, PlayerStateID previousState)
     {
+        if (!isFirstStart) return;
+
         rigidbody = agent.rigidbody;
         cameraTransform = agent.cameraTransform;
         movementSpeed = agent.movementData.movementSpeed;
         rotationTransform = agent.playerModel;
         rotationSpeed = agent.movementData.rotationSpeed;
+        isFirstStart = false;
     }
     public virtual void Update(PlayerStateAgent agent)
     {

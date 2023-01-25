@@ -16,6 +16,7 @@ MonoBehaviour:
   jumpForceMode: 1
   movementSpeed: 5.847449
   rotationSpeed: 720
+  playerDesiredFloatHeight: 2
   distanceToWall: 1
   stickToWallPower: 200
   maxTime: 5
@@ -25,3 +26,6 @@ MonoBehaviour:
   delayToNextWall: 0.5
   layerWall: 6
   playerRadius: 0.45
+  layerRails: 3
+  movementOnRailsSpeed: 5
+  railsMovementOffset: 1.5

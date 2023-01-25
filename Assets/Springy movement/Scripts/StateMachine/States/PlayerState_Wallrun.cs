@@ -23,23 +23,26 @@ public class PlayerState_Wallrun : IPlayerState
     private Vector3 rotateToWallDirection;
     private int layerWall;
     private bool isSnapFinished = false;
-
     private Vector3 previousNormal;
-
+    bool isFirstStart = true;
     public PlayerStateID GetID() => PlayerStateID.Wallrun;
 
     public void Enter(PlayerStateAgent agent, PlayerStateID previousState)
     {
-        rigidbody = agent.rigidbody;
-        playerModel = agent.playerModel;
-        distanceToWall = agent.movementData.distanceToWall;
-        layerWall = 1 << agent.movementData.layerWall;
-        stickToWallPower = agent.movementData.stickToWallPower;
-        maxTime = agent.movementData.maxTime;
-        additionalSpeed = agent.movementData.additionalSpeed;
-        rotationSpeed = agent.movementData.rotationSpeed;
-        speed = agent.movementData.movementSpeed;
-        wallMaxAngleDifference = agent.movementData.wallSnapMaxAngle;
+        if (isFirstStart)
+        {
+            rigidbody = agent.rigidbody;
+            playerModel = agent.playerModel;
+            distanceToWall = agent.movementData.distanceToWall;
+            layerWall = 1 << agent.movementData.layerWall;
+            stickToWallPower = agent.movementData.stickToWallPower;
+            maxTime = agent.movementData.maxTime;
+            additionalSpeed = agent.movementData.additionalSpeed;
+            rotationSpeed = agent.movementData.rotationSpeed;
+            speed = agent.movementData.movementSpeed;
+            wallMaxAngleDifference = agent.movementData.wallSnapMaxAngle;
+            isFirstStart = false;
+        }
         timer = 0;
 
         LockPositionConstraintY();
@@ -47,9 +50,13 @@ public class PlayerState_Wallrun : IPlayerState
         Vector3 wallDestination = Vector3.zero;
         Ray rayRight = new Ray(playerModel.position, playerModel.right);
         Ray rayLeft = new Ray(playerModel.position, -playerModel.right);
+        Ray diagonalRight = new Ray(playerModel.position, playerModel.right + playerModel.forward);
+        Ray diagonalLeft = new Ray(playerModel.position, -playerModel.right + playerModel.forward);
 
         if (!Physics.Raycast(rayRight, out RaycastHit hit, distanceToWall, layerWall) &&
-            !Physics.Raycast(rayLeft, out hit, distanceToWall, layerWall))
+            !Physics.Raycast(rayLeft, out hit, distanceToWall, layerWall) &&
+            !Physics.Raycast(diagonalLeft, out hit, distanceToWall, layerWall) &&
+            !Physics.Raycast(diagonalRight, out hit, distanceToWall, layerWall))
             return;
 
         previousNormal = hit.normal;

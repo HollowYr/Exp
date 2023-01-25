@@ -8,6 +8,7 @@ public class PlayerStateMachine
     private IPlayerState[] states;
     private PlayerStateAgent agent;
     private PlayerStateID currentState;
+    private PlayerStateID previousState;
     public PlayerStateMachine(PlayerStateAgent agent)
     {
         this.agent = agent;
@@ -15,6 +16,8 @@ public class PlayerStateMachine
         int numOfStates = System.Enum.GetNames(typeof(PlayerStateID)).Length;
         states = new IPlayerState[numOfStates];
     }
+
+    public PlayerStateID GetPreviousState() => previousState;
 
     public PlayerStateID GetCurrentState() => currentState;
 
@@ -33,7 +36,7 @@ public class PlayerStateMachine
     public void ChangeState(PlayerStateID newState)
     {
         GetState(currentState)?.Exit(agent);
-        PlayerStateID previousState = currentState;
+        previousState = currentState;
         currentState = newState;
         GetState(currentState)?.Enter(agent, previousState);
     }

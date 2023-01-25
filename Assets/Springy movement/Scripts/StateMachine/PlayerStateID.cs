@@ -6,5 +6,6 @@ public enum PlayerStateID {
     Idle,
     InAir,
     Walk,
-    Wallrun
+    Wallrun,
+    RailGrind
 }
