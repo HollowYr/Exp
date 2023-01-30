@@ -2,30 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState_Walk : IPlayerState
+public class PlayerState_Walk : PlayerState_Base
 {
-    private Rigidbody rigidbody;
+    protected Rigidbody rigidbody;
     private Transform cameraTransform;
     private Transform rotationTransform;
+    protected Animator animator;
     private float movementSpeed;
     private float rotationSpeed;
     private float horizontal;
     private float vertical;
-    private bool isFirstStart = true;
-    public virtual PlayerStateID GetID() => PlayerStateID.Walk;
-    public virtual void Enter(PlayerStateAgent agent, PlayerStateID previousState)
-    {
-        if (!isFirstStart) return;
+    public override PlayerStateID GetID() => PlayerStateID.Walk;
 
+    protected override void Init(PlayerStateAgent agent)
+    {
+        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
+        animator = agent.animator;
         rigidbody = agent.rigidbody;
         cameraTransform = agent.cameraTransform;
         movementSpeed = agent.movementData.movementSpeed;
         rotationTransform = agent.playerModel;
         rotationSpeed = agent.movementData.rotationSpeed;
-        isFirstStart = false;
     }
-    public virtual void Update(PlayerStateAgent agent)
+
+    public override void Update(PlayerStateAgent agent)
     {
+        base.Update(agent);
+
         horizontal = UnityLegacy.InputHorizontal();
         vertical = UnityLegacy.InputVertical();
 
@@ -33,9 +36,13 @@ public class PlayerState_Walk : IPlayerState
 
         if (horizontal == 0 && vertical == 0) agent.stateMachine.ChangeState(PlayerStateID.Idle);
     }
-    public virtual void FixedUpdate(PlayerStateAgent agent) => Move(agent);
+    public override void FixedUpdate(PlayerStateAgent agent) => Move(agent);
 
-    public virtual void Exit(PlayerStateAgent agent) => Move(agent);
+    public override void Exit(PlayerStateAgent agent)
+    {
+        Animate(agent);
+        Move(agent);
+    }
 
     private void Move(PlayerStateAgent agent)
     {
@@ -47,5 +54,13 @@ public class PlayerState_Walk : IPlayerState
         rotationTransform.RotateInDirectionOnYAxis(movementDirection, rotationSpeed);
     }
 
-    public virtual void OnDrawGizmos() { }
+    protected override void Animate(PlayerStateAgent agent)
+    {
+        Vector3 velocity = rigidbody.velocity;
+        velocity.y = 0;
+
+        float speed = velocity.magnitude;
+        animator.SetFloat("Speed", speed, 0.1f, Time.deltaTime);
+    }
+    // public override void OnDrawGizmos() { }
 }

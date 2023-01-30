@@ -3,13 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Android;
 
-public class PlayerState_Idle : IPlayerState
+public class PlayerState_Idle : PlayerState_Base
 {
-    public PlayerStateID GetID() => PlayerStateID.Idle;
+    private Animator animator;
+    private Rigidbody rigidbody;
+    public override PlayerStateID GetID() => PlayerStateID.Idle;
 
-    public void Enter(PlayerStateAgent agent, PlayerStateID previousState) { }
-    public void Update(PlayerStateAgent agent)
+    protected override void Init(PlayerStateAgent agent)
     {
+        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
+        animator = agent.animator;
+        rigidbody = agent.rigidbody;
+    }
+
+    public override void Enter(PlayerStateAgent agent, PlayerStateID previousState)
+    {
+        base.Enter(agent, previousState);
+        animator.Play(agent.movementData.movementTree);
+    }
+
+    public override void Update(PlayerStateAgent agent)
+    {
+        base.Update(agent);
         float horizontal = Mathf.Abs(Input.GetAxis("Horizontal"));
         float vertical = Mathf.Abs(Input.GetAxis("Vertical"));
 
@@ -17,7 +32,15 @@ public class PlayerState_Idle : IPlayerState
 
         if (horizontal > 0 || vertical > 0) agent.stateMachine.ChangeState(PlayerStateID.Walk);
     }
-    public void FixedUpdate(PlayerStateAgent agent) { }
-    public void Exit(PlayerStateAgent agent) { }
-    public void OnDrawGizmos() { }
+    protected override void Animate(PlayerStateAgent agent)
+    {
+        Vector3 velocity = rigidbody.velocity;
+        velocity.y = 0;
+
+        float speed = velocity.magnitude;
+        animator.SetFloat("Speed", speed, 0.1f, Time.deltaTime);
+    }
+    // public override void FixedUpdate(PlayerStateAgent agent) { }
+    // public override void Exit(PlayerStateAgent agent) { }
+    // public override void OnDrawGizmos() { }
 }

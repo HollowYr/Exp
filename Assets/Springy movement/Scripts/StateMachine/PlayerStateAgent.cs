@@ -9,14 +9,20 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
     [SerializeField] internal Transform playerModel;
     [SerializeField] internal MovementData movementData;
     [SerializeField] internal PlayerStateMachine stateMachine;
+    [SerializeField] internal Animator animator;
     [SerializeField] private PlayerStateID initialState;
-
     internal Rigidbody rigidbody;
+    private CapsuleCollider collider;
     private IsGrounded isGrounded;
     internal bool isGroundedState = false;
     internal bool allowGroundedStateChange = true;
     private void Start()
     {
+        animator = GetComponentInChildren<Animator>();
+        collider = GetComponentInChildren<CapsuleCollider>();
+        rigidbody = GetComponent<Rigidbody>();
+        isGrounded = GetComponent<IsGrounded>();
+
         stateMachine = new PlayerStateMachine(this);
         stateMachine.RegisterState(new PlayerState_Idle());
         stateMachine.RegisterState(new PlayerState_InAir());
@@ -25,8 +31,7 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
         stateMachine.RegisterState(new PlayerState_RailGrind());
         stateMachine.ChangeState(initialState);
 
-        rigidbody = GetComponent<Rigidbody>();
-        isGrounded = GetComponent<IsGrounded>();
+
         isGrounded.onGroundedEvent += b =>
         {
             if (isGroundedState == b) return;
@@ -34,13 +39,18 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
             isGroundedState = b;
             if (allowGroundedStateChange == false) return;
 
+            if (b)
+            {
+                Debug.Log(maxY - debugYPos);
+                maxY = 0;
+            }
             stateMachine.ChangeState((b) ? PlayerStateID.Idle : PlayerStateID.InAir);
         };
     }
     private void Update()
     {
         if (stateMachine == null) return;
-        //if (UnityLegacy.InputJump() && isGrounded.GetIsGrounded()) Jump();
+
         stateMachine.Update();
     }
     private void FixedUpdate()
@@ -65,17 +75,38 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
         return movementDirection;
     }
     public bool GetIsGrounded() => isGroundedState;
+    public void ModifyColliderRaius(float newRadius) => collider.radius = newRadius;
     internal void Jump()
     {
-        Jump(Vector3.up);
+        Vector3 movementDirection = GetPlayerMovementDirection();
+        movementDirection = movementDirection.normalized;
+        movementDirection.y = 1;
+        Jump(movementDirection);
     }
     internal void Jump(Vector3 direction)
     {
-        rigidbody.AddForce(direction * movementData.jumpForce, movementData.jumpForceMode);
+        Vector3 jumpForce = direction;
+        jumpForce.x *= movementData.jumpSideForce;
+        jumpForce.z *= movementData.jumpSideForce;
+        jumpForce.y *= movementData.jumpUpForce;
+
+        Vector3 velocity = rigidbody.velocity;
+        velocity.y = 0;
+        rigidbody.velocity = velocity;
+
+        rigidbody.AddForce(jumpForce, movementData.jumpForceMode);
         isGrounded.onGroundedEvent?.Invoke(false);
+        maxY = 0;
+        debugYPos = transform.position.y;
     }
+    float maxY = 0;
+    float debugYPos;
     private void OnDrawGizmos()
     {
+        if (transform.position.y > maxY)
+        {
+            maxY = transform.position.y;
+        }
         if (stateMachine == null) return;
         stateMachine.OnDrawGizmos();
     }

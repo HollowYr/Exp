@@ -7,6 +7,7 @@ public interface IPlayerState
     PlayerStateID GetID();
     public void Enter(PlayerStateAgent agent, PlayerStateID previousState);
     public void Update(PlayerStateAgent agent);
+    // public void Animate(PlayerStateAgent agent);
     public void FixedUpdate(PlayerStateAgent agent);
     public void Exit(PlayerStateAgent agent);
     public void OnDrawGizmos();

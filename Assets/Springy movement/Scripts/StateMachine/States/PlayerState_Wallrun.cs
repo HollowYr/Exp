@@ -4,45 +4,57 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 
-public class PlayerState_Wallrun : IPlayerState
+public class PlayerState_Wallrun : PlayerState_Base
 {
+    private Animator animator;
     private Rigidbody rigidbody;
     private Transform playerModel;
+    private float distanceToDetectWall;
     private float distanceToWall;
     private float stickToWallPower;
     private float maxTime;
     private float timer;
+    private float playerDefaultRadius;
+
     private float speed;
     private float additionalSpeed;
     private float rotationSpeed;
     private float wallMaxAngleDifference;
+    private string wallRunAnimation;
+    private string isWallOnTheLeftAnimName;
     private Vector3 force;
     private Vector3 rotateToWallDirection;
     private int layerWall;
     private bool isSnapFinished = false;
     private Vector3 previousNormal;
-    bool isFirstStart = true;
-    public PlayerStateID GetID() => PlayerStateID.Wallrun;
 
-    public void Enter(PlayerStateAgent agent, PlayerStateID previousState)
+    public override PlayerStateID GetID() => PlayerStateID.Wallrun;
+
+    protected override void Init(PlayerStateAgent agent)
     {
-        if (isFirstStart)
-        {
-            rigidbody = agent.rigidbody;
-            playerModel = agent.playerModel;
-            distanceToWall = agent.movementData.distanceToWall;
-            layerWall = 1 << agent.movementData.layerWall;
-            stickToWallPower = agent.movementData.stickToWallPower;
-            maxTime = agent.movementData.maxTime;
-            additionalSpeed = agent.movementData.additionalSpeed;
-            rotationSpeed = agent.movementData.rotationSpeed;
-            speed = agent.movementData.movementSpeed;
-            wallMaxAngleDifference = agent.movementData.wallSnapMaxAngle;
-            isFirstStart = false;
-        }
+        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
+        animator = agent.animator;
+        wallRunAnimation = agent.movementData.animationWallRun;
+        isWallOnTheLeftAnimName = agent.movementData.isWallOnTheLeft;
+        rigidbody = agent.rigidbody;
+        playerModel = agent.playerModel;
+        playerDefaultRadius = agent.movementData.playerRadius;
+        distanceToDetectWall = agent.movementData.distanceToDetectWall;
+        layerWall = 1 << agent.movementData.layerWall;
+        stickToWallPower = agent.movementData.stickToWallPower;
+        maxTime = agent.movementData.maxTime;
+        additionalSpeed = agent.movementData.additionalSpeed;
+        distanceToWall = agent.movementData.distanceToWallOnRun;
+        rotationSpeed = agent.movementData.rotationSpeed;
+        speed = agent.movementData.movementSpeed;
+        wallMaxAngleDifference = agent.movementData.wallSnapMaxAngle;
+    }
+
+    public override void Enter(PlayerStateAgent agent, PlayerStateID previousState)
+    {
+        base.Enter(agent, previousState);
         timer = 0;
 
         LockPositionConstraintY();
@@ -53,39 +65,50 @@ public class PlayerState_Wallrun : IPlayerState
         Ray diagonalRight = new Ray(playerModel.position, playerModel.right + playerModel.forward);
         Ray diagonalLeft = new Ray(playerModel.position, -playerModel.right + playerModel.forward);
 
-        if (!Physics.Raycast(rayRight, out RaycastHit hit, distanceToWall, layerWall) &&
-            !Physics.Raycast(rayLeft, out hit, distanceToWall, layerWall) &&
-            !Physics.Raycast(diagonalLeft, out hit, distanceToWall, layerWall) &&
-            !Physics.Raycast(diagonalRight, out hit, distanceToWall, layerWall))
+        if (!Physics.Raycast(rayRight, out RaycastHit hit, distanceToDetectWall, layerWall) &&
+            !Physics.Raycast(rayLeft, out hit, distanceToDetectWall, layerWall) &&
+            !Physics.Raycast(diagonalLeft, out hit, distanceToDetectWall, layerWall) &&
+            !Physics.Raycast(diagonalRight, out hit, distanceToDetectWall, layerWall))
             return;
 
+        agent.ModifyColliderRaius(playerDefaultRadius + distanceToWall);
+        bool isWallOnTheLeft;
+        if (Vector3.Dot(playerModel.right.normalized, hit.normal.normalized) > 0)
+            isWallOnTheLeft = true;
+        else
+            isWallOnTheLeft = false;
+        animator.SetBool(isWallOnTheLeftAnimName, isWallOnTheLeft);
+
+        // animator.GetCurrentAnimatorClipInfo(0).
         previousNormal = hit.normal;
         wallDestination = hit.point + (playerModel.position - hit.point).normalized * agent.movementData.playerRadius;
+        // compensate difference in Y position
         wallDestination -= playerModel.localPosition;
         agent.transform.DOMove(wallDestination, agent.movementData.wallSnapTime)
             .OnComplete(() => isSnapFinished = true);
     }
 
-    public void Update(PlayerStateAgent agent)
+    public override void Update(PlayerStateAgent agent)
     {
+        base.Update(agent);
         if (!isSnapFinished) return;
 
         if (UnityLegacy.InputJump())
         {
-            Jump(agent);
+            agent.Jump();
+            ChangeStateToInAir(agent);
             return;
         }
-
 
         Ray rayRight = new Ray(playerModel.position, playerModel.right);
         Ray rayLeft = new Ray(playerModel.position, -playerModel.right);
         Ray diagonalRight = new Ray(playerModel.position, playerModel.right + playerModel.forward);
         Ray diagonalLeft = new Ray(playerModel.position, -playerModel.right + playerModel.forward);
 
-        if (Physics.Raycast(rayRight, out RaycastHit hit, distanceToWall, layerWall) ||
-            Physics.Raycast(rayLeft, out hit, distanceToWall, layerWall) ||
-            Physics.Raycast(diagonalRight, out hit, distanceToWall, layerWall) ||
-            Physics.Raycast(diagonalLeft, out hit, distanceToWall, layerWall))
+        if (Physics.Raycast(rayRight, out RaycastHit hit, distanceToDetectWall, layerWall) ||
+            Physics.Raycast(rayLeft, out hit, distanceToDetectWall, layerWall) ||
+            Physics.Raycast(diagonalRight, out hit, distanceToDetectWall, layerWall) ||
+            Physics.Raycast(diagonalLeft, out hit, distanceToDetectWall, layerWall))
         {
             force = (hit.point - (hit.point + hit.normal)) * stickToWallPower * Time.fixedDeltaTime;
             timer += Time.deltaTime;
@@ -103,7 +126,7 @@ public class PlayerState_Wallrun : IPlayerState
     }
 
 
-    public void FixedUpdate(PlayerStateAgent agent)
+    public override void FixedUpdate(PlayerStateAgent agent)
     {
         if (!isSnapFinished) return;
 
@@ -117,26 +140,25 @@ public class PlayerState_Wallrun : IPlayerState
         {
             if ((playerModel.forward - rotateToWallDirection).magnitude > (playerModel.forward - -rotateToWallDirection).magnitude)
                 rotateToWallDirection = -rotateToWallDirection;
-            playerModel.RotateInDirectionOnYAxis(rotateToWallDirection, rotationSpeed * 10f);
+            playerModel.RotateInDirectionOnYAxis(rotateToWallDirection, rotationSpeed);
         }
         float input = Mathf.CeilToInt(UnityLegacy.InputVertical());
         rigidbody.velocity = force * input + playerModel.forward * input * (speed + additionalSpeed);
         rotateToWallDirection = Vector3.zero;
     }
 
+    protected override void Animate(PlayerStateAgent agent)
+    {
+        animator.Play(wallRunAnimation);
+    }
+
     private static void ChangeStateToInAir(PlayerStateAgent agent) =>
         agent.stateMachine.ChangeState(PlayerStateID.InAir);
 
-    public void Exit(PlayerStateAgent agent) => ResetConstraints();
-    private void Jump(PlayerStateAgent agent)
+    public override void Exit(PlayerStateAgent agent)
     {
-        Vector3 movementDirection = agent.GetPlayerMovementDirection();
-        movementDirection.y = 1;
-        movementDirection = movementDirection.normalized;
-        //Debug.Break();
-        agent.Jump(movementDirection);
-        ChangeStateToInAir(agent);
-
+        agent.ModifyColliderRaius(playerDefaultRadius);
+        ResetConstraints();
     }
     private void LockPositionConstraintY()
     {
@@ -153,7 +175,7 @@ public class PlayerState_Wallrun : IPlayerState
                                 RigidbodyConstraints.FreezeRotationZ;
     }
 
-    public void OnDrawGizmos()
+    public override void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
 
