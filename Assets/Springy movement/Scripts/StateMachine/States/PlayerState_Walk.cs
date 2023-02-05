@@ -62,5 +62,4 @@ public class PlayerState_Walk : PlayerState_Base
         float speed = velocity.magnitude;
         animator.SetFloat("Speed", speed, 0.1f, Time.deltaTime);
     }
-    // public override void OnDrawGizmos() { }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 public class CameraRotation : MonoBehaviour
 {
     [SerializeField] private float rotationPower = 10f;
-    [SerializeField] private readonly Vector2 angleClamp = new Vector2(40, 340);
+    [SerializeField] private Vector2 angleClamp = new Vector2(40, 340);
 
     float horizontal;
     float vertical;

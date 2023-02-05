@@ -6,14 +6,15 @@ using UnityEngine;
 
 public class PlayerState_RailGrind : PlayerState_Base
 {
+    private string animationName;
     private Animator animator;
     private Transform rotationTransform;
     private Transform playerModel;
     private PathCreator pathCreator;
-    int layerRails;
+    private float playerRadius;
+    private int layerRails;
     private float speed;
     private float railsOffset;
-    private float rotationSpeed;
     private float playerHeight;
     public override PlayerStateID GetID() => PlayerStateID.RailGrind;
 
@@ -23,10 +24,11 @@ public class PlayerState_RailGrind : PlayerState_Base
         MovementData movementData = agent.movementData;
         animator = agent.animator;
         layerRails = 1 << movementData.layerRails;
+        playerRadius = agent.movementData.playerRadius;
         playerModel = agent.playerModel;
+        animationName = agent.movementData.animationRailGrinding;
         speed = movementData.railsMovementSpeed;
         rotationTransform = agent.playerModel;
-        rotationSpeed = movementData.rotationSpeed;
         playerHeight = movementData.playerDesiredFloatHeight;
         railsOffset = movementData.railsMovementOffset + movementData.playerDesiredFloatHeight;
     }
@@ -34,18 +36,26 @@ public class PlayerState_RailGrind : PlayerState_Base
     public override void Enter(PlayerStateAgent agent, PlayerStateID previousState)
     {
         base.Enter(agent, previousState);
-        animator.Play("RailGrinding");
+        animator.Play(animationName);
 
         agent.allowGroundedStateChange = false;
-        Ray rayDown = new Ray(playerModel.position, -playerModel.up);
-        if (Physics.Raycast(rayDown, out RaycastHit hit, playerHeight + .5f, layerRails))
+        if (Physics.SphereCast(playerModel.position, playerRadius, -playerModel.up, out RaycastHit hit, playerHeight + .5f, layerRails))
         {
             pathCreator = hit.transform.GetComponentInChildren<PathCreator>();
             distanceTravelled = pathCreator.path.GetClosestDistanceAlongPath(agent.transform.position);
+
+            // check is reversed moving needed
+            Vector3 currentPosition = pathCreator.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
+            Vector3 nextPositionAlongPath = pathCreator.path.GetPointAtDistance(distanceTravelled + 2 * speed * Time.deltaTime, endOfPathInstruction);
+            Vector3 direction = nextPositionAlongPath - currentPosition;
+            if (Vector3.Dot(direction.normalized, playerModel.forward.normalized) < 0)
+            {
+                speed = -speed;
+            }
         }
     }
 
-    public EndOfPathInstruction endOfPathInstruction = EndOfPathInstruction.Stop;
+    private EndOfPathInstruction endOfPathInstruction = EndOfPathInstruction.Stop;
     private float distanceTravelled;
 
     public override void Update(PlayerStateAgent agent)
@@ -54,7 +64,7 @@ public class PlayerState_RailGrind : PlayerState_Base
         if (pathCreator == null) return;
 
         distanceTravelled += speed * Time.deltaTime;
-        if (pathCreator.path.length < distanceTravelled)
+        if (pathCreator.path.length < distanceTravelled || distanceTravelled < 0)
         {
             ChangeStateToInAir(agent);
             return;
@@ -77,8 +87,8 @@ public class PlayerState_RailGrind : PlayerState_Base
             agent.stateMachine.ChangeState(PlayerStateID.InAir);
     public override void Exit(PlayerStateAgent agent)
     {
-        agent.allowGroundedStateChange = true;
+        agent.DoAfterTime(0.13f, () => agent.allowGroundedStateChange = true);
+        speed = Mathf.Abs(speed);
         agent.rigidbody.velocity += playerModel.forward * speed;
     }
 }
-

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: MovementData
   m_EditorClassIdentifier: 
   player: {fileID: 4256373129756691894, guid: b11b024cb1d9e8c4dbe2c2de6cecfca7, type: 3}
-  jumpUpForce: 25
-  jumpSideForce: 50
+  jumpHeight: 3.5
+  jumpUpForce: 18.52026
+  jumpSideForce: 25
   jumpForceMode: 2
-  movementSpeed: 6.5
+  movementSpeed: 7
   rotationSpeed: 720
   playerDesiredFloatHeight: 2
   distanceToDetectWall: 1.5
@@ -26,16 +27,18 @@ MonoBehaviour:
   additionalSpeed: 2
   wallSnapTime: 0.15
   wallSnapMaxAngle: 30
-  delayToNextWall: 0.5
+  delayForNextWall: 0.5
   layerWall: 6
   playerRadius: 0.2
   layerRails: 3
   railsMovementOffset: 0.25
   railsMovementSpeed: 8
+  delayForRailsState: 0.4
   animator: {fileID: 4256373129300248915, guid: b11b024cb1d9e8c4dbe2c2de6cecfca7, type: 3}
   jumpingUp: Jumping Up
   animationJumpingDown: Jumping Down
   animationWallRun: WallRun
+  animationRailGrinding: RailGrinding
   isWallOnTheLeft: IsWallOnTheLeft
   movementTree: Movement Tree
-  coefficient: 0.5232222
+  coefficient: 0.56347007

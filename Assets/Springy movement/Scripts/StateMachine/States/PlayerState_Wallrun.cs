@@ -71,7 +71,7 @@ public class PlayerState_Wallrun : PlayerState_Base
             !Physics.Raycast(diagonalRight, out hit, distanceToDetectWall, layerWall))
             return;
 
-        agent.ModifyColliderRaius(playerDefaultRadius + distanceToWall);
+        agent.ModifyColliderRadius(playerDefaultRadius + distanceToWall);
         bool isWallOnTheLeft;
         if (Vector3.Dot(playerModel.right.normalized, hit.normal.normalized) > 0)
             isWallOnTheLeft = true;
@@ -157,7 +157,7 @@ public class PlayerState_Wallrun : PlayerState_Base
 
     public override void Exit(PlayerStateAgent agent)
     {
-        agent.ModifyColliderRaius(playerDefaultRadius);
+        agent.ModifyColliderRadius(playerDefaultRadius);
         ResetConstraints();
     }
     private void LockPositionConstraintY()
@@ -192,4 +192,3 @@ public class PlayerState_Wallrun : PlayerState_Base
         Gizmos.DrawSphere(rigidbody.position, .1f);
     }
 }
-

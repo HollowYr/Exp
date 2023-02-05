@@ -1253,6 +1253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gravityForce: 68.6
+  movementData: {fileID: 0}
 --- !u!114 &4256373129756691896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1295,10 +1296,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   desiredFloatHeight: 2
+  tension: 200
+  rideSpringDamer: 10
   uprightSpringStrength: 50
   uprightSpringDamper: 1.5
-  tension: 50
-  rideSpringDamer: 10
 --- !u!114 &4256373129756691899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1357,6 +1358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationPower: 10
+  angleClamp: {x: 40, y: 340}
 --- !u!1 &4265253949439341882
 GameObject:
   m_ObjectHideFlags: 0

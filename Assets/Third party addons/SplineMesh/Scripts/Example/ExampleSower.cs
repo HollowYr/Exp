@@ -1,5 +1,4 @@
-﻿using PathCreation;
-using PathCreation.Examples;
+﻿using PathCreation.Examples;
 using System;
 using System.Collections;
 using System.Collections.Generic;

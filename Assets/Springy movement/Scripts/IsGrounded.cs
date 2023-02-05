@@ -9,8 +9,8 @@ public class IsGrounded : ImprovedMonoBehaviour
     [SerializeField] private float playerHeight = 2f;
     private bool isGrounded = false;
     public Action<bool> onGroundedEvent;
-    public bool GetIsGrounded() => isGrounded;
-    private void Update()
+
+    private void FixedUpdate()
     {
         Ray ray = new Ray(transform.position, transform.up * -1);
         if (Physics.Raycast(ray, out RaycastHit hit, playerHeight))
@@ -19,17 +19,14 @@ public class IsGrounded : ImprovedMonoBehaviour
             debugHit = hit.point;
             debugColor = Color.green;
 #endif
-            //if (isGrounded == true) return;
             isGrounded = true;
             onGroundedEvent?.Invoke(isGrounded);
         }
         else
         {
-
 #if DEBUG
             debugColor = Color.red;
 #endif
-            //if (isGrounded == false) return;
             isGrounded = false;
             onGroundedEvent?.Invoke(isGrounded);
         }
@@ -42,6 +39,7 @@ public class IsGrounded : ImprovedMonoBehaviour
     {
         if (debugHit == null) return;
         Gizmos.color = debugColor;
+        Gizmos.DrawSphere(transform.position, .1f);
         Gizmos.DrawSphere(debugHit, .1f);
     }
 #endif

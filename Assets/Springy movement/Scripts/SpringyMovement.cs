@@ -1,15 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
 
 public class SpringyMovement : ImprovedMonoBehaviour
 {
-    [SerializeField] private float desiredFloatHeight = 1.5f;
-    [SerializeField] private float uprightSpringStrength = 50f;
-    [SerializeField] private float uprightSpringDamper = 1f;
-    [SerializeField] private float tension = 10f;
-    [SerializeField] private float rideSpringDamer = 1f;
+    [Foldout("Floating"), SerializeField] private float desiredFloatHeight = 1.5f;
+    [Foldout("Floating"), SerializeField] private float tension = 50f;
+    [Foldout("Floating"), SerializeField] private float rideSpringDamer = 1f;
+
+    [Foldout("Rotation"), SerializeField] private float uprightSpringStrength = 50f;
+    [Foldout("Rotation"), SerializeField] private float uprightSpringDamper = 1f;
+
+    // [Header("Debug")]
+    // [SerializeField] private AnimationCurve debugCurve;
+
 
     private float rayLength = float.PositiveInfinity;
     private Rigidbody springedRigidbody;

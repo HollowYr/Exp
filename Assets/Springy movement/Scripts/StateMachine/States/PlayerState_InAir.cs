@@ -9,13 +9,15 @@ using UnityEngine;
 public class PlayerState_InAir : PlayerState_Walk
 {
     private Transform playerModel;
-    // private Animator animator;
-    private MovementData movementData;
-    // private Rigidbody rigidbody;
-    PlayerStateID previousState;
+    private PlayerStateID previousState;
     private float delayToChangeState;
+    private float delayForWallrunState;
+    private float delayForRailsState;
     private float distanceToWall;
     private float distanceToRail;
+    private float playerRadius;
+    private string jumpingUp;
+    private string jumpingDown;
     private int layerWall;
     private int layerRails;
     private bool canChangeState = false;
@@ -26,14 +28,17 @@ public class PlayerState_InAir : PlayerState_Walk
     {
         base.Init(agent);
         Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
-        // rigidbody = agent.rigidbody;
-        movementData = agent.movementData;
+        MovementData movementData = agent.movementData;
         playerModel = agent.playerModel;
+        playerRadius = movementData.playerRadius;
         distanceToWall = movementData.distanceToDetectWall;
         layerWall = 1 << movementData.layerWall;
         layerRails = 1 << movementData.layerRails;
-        delayToChangeState = movementData.delayToNextWall;
+        delayForWallrunState = movementData.delayForNextWall;
+        delayForRailsState = movementData.delayForRailsState;
         distanceToRail = movementData.playerDesiredFloatHeight;
+        jumpingUp = movementData.jumpingUp;
+        jumpingDown = movementData.animationJumpingDown;
         animator = agent.animator;
     }
 
@@ -42,12 +47,12 @@ public class PlayerState_InAir : PlayerState_Walk
         base.Enter(agent, previousState);
 
         this.previousState = previousState;
-        animator.Play(movementData.jumpingUp);
+        animator.Play(jumpingUp);
 
         canPlayJumpingDown = true;
         canChangeState = false;
-        if (previousState == PlayerStateID.Wallrun ||
-            previousState == PlayerStateID.RailGrind)
+        delayToChangeState = GetDelayByState(previousState);
+        if (delayToChangeState > 0)
         {
             agent.DoAfterTime(delayToChangeState, () => canChangeState = true);
         }
@@ -55,7 +60,22 @@ public class PlayerState_InAir : PlayerState_Walk
         {
             canChangeState = true;
         }
-        //Debug.Log($"Enter: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
+    }
+
+    private float GetDelayByState(PlayerStateID previousState)
+    {
+        float delay = 0;
+        switch (previousState)
+        {
+            case PlayerStateID.Wallrun:
+                delay = delayForWallrunState;
+                break;
+
+            case PlayerStateID.RailGrind:
+                delay = delayForRailsState;
+                break;
+        }
+        return delay;
     }
 
     public override void Update(PlayerStateAgent agent)
@@ -63,13 +83,12 @@ public class PlayerState_InAir : PlayerState_Walk
         base.Update(agent);
 
         WallrunCheck();
-
         RailGrindCheck();
-
 
         void WallrunCheck()
         {
-            if (UnityLegacy.InputVertical() <= 0 || (!canChangeState && previousState == PlayerStateID.Wallrun)) return;
+            if (UnityLegacy.InputVertical() <= 0 || !canChangeState && previousState == PlayerStateID.Wallrun) return;
+
             Ray rayRight = new Ray(playerModel.position, playerModel.right);
             Ray rayLeft = new Ray(playerModel.position, -playerModel.right);
             Ray diagonalRight = new Ray(playerModel.position, playerModel.right + playerModel.forward);
@@ -82,23 +101,21 @@ public class PlayerState_InAir : PlayerState_Walk
                 agent.stateMachine.ChangeState(PlayerStateID.Wallrun);
 
 #if DEBUG && UNITY_EDITOR
-            Debug.DrawRay(rayLeft.origin, rayLeft.direction, Color.green, Time.deltaTime);
-            Debug.DrawRay(rayRight.origin, rayRight.direction, Color.green, Time.deltaTime);
-            Debug.DrawRay(diagonalLeft.origin, diagonalLeft.direction, Color.green, Time.deltaTime);
-            Debug.DrawRay(diagonalRight.origin, diagonalRight.direction, Color.green, Time.deltaTime);
+            Debug.DrawRay(rayLeft.origin, rayLeft.direction * distanceToWall, Color.green, Time.deltaTime);
+            Debug.DrawRay(rayRight.origin, rayRight.direction * distanceToWall, Color.green, Time.deltaTime);
+            Debug.DrawRay(diagonalLeft.origin, diagonalLeft.direction * distanceToWall, Color.green, Time.deltaTime);
+            Debug.DrawRay(diagonalRight.origin, diagonalRight.direction * distanceToWall, Color.green, Time.deltaTime);
 #endif
         }
 
         void RailGrindCheck()
         {
-            if (!canChangeState && previousState == PlayerStateID.RailGrind) return;
-            Ray rayDown = new Ray(playerModel.position, -playerModel.up);
-            if (Physics.Raycast(rayDown, out RaycastHit hit, distanceToRail + .5f, layerRails))
-                agent.stateMachine.ChangeState(PlayerStateID.RailGrind);
+            if ((!canChangeState && previousState == PlayerStateID.RailGrind) ||
+                !Physics.SphereCast(playerModel.position, playerRadius, -playerModel.up,
+                 out RaycastHit hit, distanceToRail + .5f, layerRails))
+                return;
 
-#if DEBUG && UNITY_EDITOR
-            Debug.DrawRay(rayDown.origin, rayDown.direction, Color.green, Time.deltaTime);
-#endif
+            agent.stateMachine.ChangeState(PlayerStateID.RailGrind);
         }
     }
 
@@ -106,7 +123,7 @@ public class PlayerState_InAir : PlayerState_Walk
     {
         if (rigidbody.velocity.y >= 0 || !canPlayJumpingDown) return;
 
-        animator.Play(movementData.animationJumpingDown);
+        animator.Play(jumpingDown);
         canPlayJumpingDown = false;
     }
 }

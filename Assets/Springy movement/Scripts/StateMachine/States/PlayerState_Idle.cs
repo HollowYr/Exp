@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Android;
-
 public class PlayerState_Idle : PlayerState_Base
 {
     private Animator animator;
@@ -27,6 +25,7 @@ public class PlayerState_Idle : PlayerState_Base
         base.Update(agent);
         float horizontal = Mathf.Abs(Input.GetAxis("Horizontal"));
         float vertical = Mathf.Abs(Input.GetAxis("Vertical"));
+        rigidbody.velocity = animator.transform.forward * vertical + animator.transform.right * horizontal + Vector3.up * rigidbody.velocity.y;
 
         if (UnityLegacy.InputJump() && agent.GetIsGrounded()) agent.Jump();
 
@@ -40,7 +39,4 @@ public class PlayerState_Idle : PlayerState_Base
         float speed = velocity.magnitude;
         animator.SetFloat("Speed", speed, 0.1f, Time.deltaTime);
     }
-    // public override void FixedUpdate(PlayerStateAgent agent) { }
-    // public override void Exit(PlayerStateAgent agent) { }
-    // public override void OnDrawGizmos() { }
 }

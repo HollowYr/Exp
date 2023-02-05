@@ -31,26 +31,22 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
         stateMachine.RegisterState(new PlayerState_RailGrind());
         stateMachine.ChangeState(initialState);
 
-
         isGrounded.onGroundedEvent += b =>
         {
-            if (isGroundedState == b) return;
-
+            if (isGroundedState == b || allowGroundedStateChange == false) return;
             isGroundedState = b;
-            if (allowGroundedStateChange == false) return;
 
-            if (b)
-            {
-                Debug.Log(maxY - debugYPos);
-                maxY = 0;
-            }
+            // if (b)
+            // {
+            //     Debug.Log(maxY);
+            //     maxY = 0;
+            // }
             stateMachine.ChangeState((b) ? PlayerStateID.Idle : PlayerStateID.InAir);
         };
     }
     private void Update()
     {
         if (stateMachine == null) return;
-
         stateMachine.Update();
     }
     private void FixedUpdate()
@@ -70,12 +66,13 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
         Vector3 cameraRight = cameraTransform.right;
         cameraRight.y = 0;
         cameraRight = cameraRight.normalized;
+
         Vector3 movementDirection = vertical * cameraForward + horizontal * cameraRight;
         movementDirection = movementDirection.normalized;
         return movementDirection;
     }
     public bool GetIsGrounded() => isGroundedState;
-    public void ModifyColliderRaius(float newRadius) => collider.radius = newRadius;
+    public void ModifyColliderRadius(float newRadius) => collider.radius = newRadius;
     internal void Jump()
     {
         Vector3 movementDirection = GetPlayerMovementDirection();
@@ -96,17 +93,21 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
 
         rigidbody.AddForce(jumpForce, movementData.jumpForceMode);
         isGrounded.onGroundedEvent?.Invoke(false);
-        maxY = 0;
-        debugYPos = transform.position.y;
+        // maxY = 0;
+        // debugYPos = transform.position.y;
     }
-    float maxY = 0;
-    float debugYPos;
+    // float maxY = 0;
+    // float debugYPos;
     private void OnDrawGizmos()
     {
-        if (transform.position.y > maxY)
-        {
-            maxY = transform.position.y;
-        }
+        // if (transform.position.y > maxY)
+        // {
+        //     maxY = transform.position.y;
+        // }
+        // Vector3 pos = transform.position;
+        // pos.y = maxY;
+        // Gizmos.color = Color.green;
+        // Gizmos.DrawSphere(pos, .25f);
         if (stateMachine == null) return;
         stateMachine.OnDrawGizmos();
     }

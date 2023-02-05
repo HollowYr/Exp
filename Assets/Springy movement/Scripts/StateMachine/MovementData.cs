@@ -9,6 +9,8 @@ using UnityEngine;
 public class MovementData : ScriptableObject
 {
     [SerializeField] private Transform player;
+    [SerializeField] internal readonly float gravity = 49f;
+    [Foldout("Movement"), SerializeField] internal float jumpHeight = 3f;
     [Foldout("Movement"), SerializeField] internal float jumpUpForce = 10f;
     [Foldout("Movement"), SerializeField] internal float jumpSideForce = 30f;
     [Foldout("Movement"), SerializeField] internal ForceMode jumpForceMode = ForceMode.Impulse;
@@ -23,13 +25,14 @@ public class MovementData : ScriptableObject
     [Foldout("Wallrun"), SerializeField] internal float additionalSpeed = 50f;
     [Foldout("Wallrun"), SerializeField] internal float wallSnapTime = .15f;
     [Foldout("Wallrun"), SerializeField] internal float wallSnapMaxAngle = 30f;
-    [Foldout("Wallrun"), SerializeField] internal float delayToNextWall = .2f;
+    [Foldout("Wallrun"), SerializeField] internal float delayForNextWall = .2f;
     [Foldout("Wallrun"), SerializeField, Layer] internal int layerWall;
 
     [Foldout("Player"), SerializeField] internal float playerRadius = 1f;
     [Foldout("GrindRails"), SerializeField, Layer] internal int layerRails;
     [Foldout("GrindRails"), SerializeField] internal float railsMovementOffset = 1f;
     [Foldout("GrindRails"), SerializeField] internal float railsMovementSpeed = 7f;
+    [Foldout("GrindRails"), SerializeField] internal float delayForRailsState = 1f;
 
 
     [Foldout("Animation"), SerializeField,]
@@ -40,6 +43,8 @@ public class MovementData : ScriptableObject
     internal string animationJumpingDown = "Jumping_Down";
     [Foldout("Animation"), SerializeField, Dropdown("Animations")]
     internal string animationWallRun = "";
+    [Foldout("Animation"), SerializeField, Dropdown("Animations")]
+    internal string animationRailGrinding = "";
 
     [Foldout("Animation"), SerializeField, AnimatorParam("animator")]
     internal string isWallOnTheLeft;
@@ -49,8 +54,6 @@ public class MovementData : ScriptableObject
     private const float runAnimationDefaultSpeed = 12.42302f;
     [Foldout("Animation"), SerializeField]
     private float coefficient;
-
-
 
     [Button("remap")]
     private void SetAnimationSpeed()
@@ -66,14 +69,12 @@ public class MovementData : ScriptableObject
         AnimationClip[] clips = AnimationUtility.GetAnimationClips(animator);
         animations = clips.Select(t => t.name).ToList();
         return animations;
-
     }
 
     void OnValidate()
     {
         playerRadius = player.GetComponentInChildren<CapsuleCollider>().radius;
         animator = player.GetComponentInChildren<Animator>();
+        jumpUpForce = Mathf.Sqrt(jumpHeight * 2 * gravity);
     }
-
 }
-
