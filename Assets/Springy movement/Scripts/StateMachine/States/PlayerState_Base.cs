@@ -1,5 +1,7 @@
 #define DEBUG
 
+using UnityEngine;
+
 public class PlayerState_Base : IPlayerState
 {
     private bool isFirstStart = true;
@@ -14,7 +16,10 @@ public class PlayerState_Base : IPlayerState
         }
     }
 
-    protected virtual void Init(PlayerStateAgent agent) { }
+    protected virtual void Init(PlayerStateAgent agent)
+    {
+        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
+    }
 
     public virtual void Exit(PlayerStateAgent agent) { }
 

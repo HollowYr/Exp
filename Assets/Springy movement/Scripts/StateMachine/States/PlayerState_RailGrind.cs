@@ -1,4 +1,5 @@
 #define DEBUG
+using DG.Tweening;
 using PathCreation;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,17 +11,20 @@ public class PlayerState_RailGrind : PlayerState_Base
     private Animator animator;
     private Transform rotationTransform;
     private Transform playerModel;
+    private Rigidbody rigidbody;
     private PathCreator pathCreator;
     private float playerRadius;
     private int layerRails;
     private float speed;
+    private float currentSpeed;
     private float railsOffset;
     private float playerHeight;
-    public override PlayerStateID GetID() => PlayerStateID.RailGrind;
+    private EndOfPathInstruction endOfPathInstruction = EndOfPathInstruction.Stop;
+    private float distanceTravelled;
 
+    public override PlayerStateID GetID() => PlayerStateID.RailGrind;
     protected override void Init(PlayerStateAgent agent)
     {
-        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
         MovementData movementData = agent.movementData;
         animator = agent.animator;
         layerRails = 1 << movementData.layerRails;
@@ -28,6 +32,7 @@ public class PlayerState_RailGrind : PlayerState_Base
         playerModel = agent.playerModel;
         animationName = agent.movementData.animationRailGrinding;
         speed = movementData.railsMovementSpeed;
+        rigidbody = agent.rigidbody;
         rotationTransform = agent.playerModel;
         playerHeight = movementData.playerDesiredFloatHeight;
         railsOffset = movementData.railsMovementOffset + movementData.playerDesiredFloatHeight;
@@ -39,31 +44,34 @@ public class PlayerState_RailGrind : PlayerState_Base
         animator.Play(animationName);
 
         agent.allowGroundedStateChange = false;
-        if (Physics.SphereCast(playerModel.position, playerRadius, -playerModel.up, out RaycastHit hit, playerHeight + .5f, layerRails))
-        {
-            pathCreator = hit.transform.GetComponentInChildren<PathCreator>();
-            distanceTravelled = pathCreator.path.GetClosestDistanceAlongPath(agent.transform.position);
+        Ray rayDown = new Ray(playerModel.position, -playerModel.up);
+        if (!Physics.SphereCast(rayDown, playerRadius, out RaycastHit hit, playerHeight + .5f, layerRails))
+            return;
 
-            // check is reversed moving needed
-            Vector3 currentPosition = pathCreator.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
-            Vector3 nextPositionAlongPath = pathCreator.path.GetPointAtDistance(distanceTravelled + 2 * speed * Time.deltaTime, endOfPathInstruction);
-            Vector3 direction = nextPositionAlongPath - currentPosition;
-            if (Vector3.Dot(direction.normalized, playerModel.forward.normalized) < 0)
-            {
-                speed = -speed;
-            }
+        pathCreator = hit.transform.GetComponentInChildren<PathCreator>();
+        distanceTravelled = pathCreator.path.GetClosestDistanceAlongPath(agent.transform.position);
+
+        // check is reversed moving needed
+        Vector3 currentPosition = pathCreator.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
+        Vector3 nextPositionAlongPath = pathCreator.path.GetPointAtDistance(distanceTravelled + 2 * speed * Time.deltaTime, endOfPathInstruction);
+        Vector3 direction = nextPositionAlongPath - currentPosition;
+        if (Vector3.Dot(direction.normalized, playerModel.forward.normalized) < 0)
+        {
+            speed = -speed;
         }
+
+        currentSpeed = rigidbody.velocity.magnitude;
+        DOTween.To(() => currentSpeed, x => currentSpeed = x, speed, .5f);
     }
 
-    private EndOfPathInstruction endOfPathInstruction = EndOfPathInstruction.Stop;
-    private float distanceTravelled;
+
 
     public override void Update(PlayerStateAgent agent)
     {
         base.Update(agent);
         if (pathCreator == null) return;
 
-        distanceTravelled += speed * Time.deltaTime;
+        distanceTravelled += currentSpeed * Time.deltaTime;
         if (pathCreator.path.length < distanceTravelled || distanceTravelled < 0)
         {
             ChangeStateToInAir(agent);

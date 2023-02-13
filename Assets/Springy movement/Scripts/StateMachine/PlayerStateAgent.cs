@@ -78,14 +78,14 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
         Vector3 movementDirection = GetPlayerMovementDirection();
         movementDirection = movementDirection.normalized;
         movementDirection.y = 1;
-        Jump(movementDirection);
+        Jump(movementDirection, movementData.jumpUpForce, movementData.jumpSideForce);
     }
-    internal void Jump(Vector3 direction)
+    internal void Jump(Vector3 direction, float upForce, float sideForce)
     {
         Vector3 jumpForce = direction;
-        jumpForce.x *= movementData.jumpSideForce;
-        jumpForce.z *= movementData.jumpSideForce;
-        jumpForce.y *= movementData.jumpUpForce;
+        jumpForce.x *= sideForce;
+        jumpForce.z *= sideForce;
+        jumpForce.y *= upForce;
 
         Vector3 velocity = rigidbody.velocity;
         velocity.y = 0;
@@ -93,6 +93,7 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
 
         rigidbody.AddForce(jumpForce, movementData.jumpForceMode);
         isGrounded.onGroundedEvent?.Invoke(false);
+
         // maxY = 0;
         // debugYPos = transform.position.y;
     }

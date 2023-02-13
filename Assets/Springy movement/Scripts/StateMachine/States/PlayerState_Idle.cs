@@ -9,7 +9,6 @@ public class PlayerState_Idle : PlayerState_Base
 
     protected override void Init(PlayerStateAgent agent)
     {
-        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
         animator = agent.animator;
         rigidbody = agent.rigidbody;
     }

@@ -16,7 +16,6 @@ public class PlayerState_Walk : PlayerState_Base
 
     protected override void Init(PlayerStateAgent agent)
     {
-        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
         animator = agent.animator;
         rigidbody = agent.rigidbody;
         cameraTransform = agent.cameraTransform;
@@ -34,7 +33,10 @@ public class PlayerState_Walk : PlayerState_Base
 
         if (UnityLegacy.InputJump() && agent.GetIsGrounded()) agent.Jump();
 
-        if (horizontal == 0 && vertical == 0) agent.stateMachine.ChangeState(PlayerStateID.Idle);
+        if (horizontal == 0 &&
+            vertical == 0 &&
+            Mathf.Abs(rigidbody.velocity.y) < 0.1f)
+            agent.stateMachine.ChangeState(PlayerStateID.Idle);
     }
     public override void FixedUpdate(PlayerStateAgent agent) => Move(agent);
 

@@ -1313,6 +1313,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerHeight: 2.5
+  layerWalkable: 7
+  layerGrindRails: 3
 --- !u!1 &4256373129851570419
 GameObject:
   m_ObjectHideFlags: 0

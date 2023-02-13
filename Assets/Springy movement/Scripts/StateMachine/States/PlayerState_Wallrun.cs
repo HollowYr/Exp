@@ -17,9 +17,8 @@ public class PlayerState_Wallrun : PlayerState_Base
     private float maxTime;
     private float timer;
     private float playerDefaultRadius;
-
     private float speed;
-    private float additionalSpeed;
+    private float currentSpeed;
     private float rotationSpeed;
     private float wallMaxAngleDifference;
     private string wallRunAnimation;
@@ -34,7 +33,6 @@ public class PlayerState_Wallrun : PlayerState_Base
 
     protected override void Init(PlayerStateAgent agent)
     {
-        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
         animator = agent.animator;
         wallRunAnimation = agent.movementData.animationWallRun;
         isWallOnTheLeftAnimName = agent.movementData.isWallOnTheLeft;
@@ -45,10 +43,9 @@ public class PlayerState_Wallrun : PlayerState_Base
         layerWall = 1 << agent.movementData.layerWall;
         stickToWallPower = agent.movementData.stickToWallPower;
         maxTime = agent.movementData.maxTime;
-        additionalSpeed = agent.movementData.additionalSpeed;
         distanceToWall = agent.movementData.distanceToWallOnRun;
         rotationSpeed = agent.movementData.rotationSpeed;
-        speed = agent.movementData.movementSpeed;
+        speed = agent.movementData.wallrunSpeed;
         wallMaxAngleDifference = agent.movementData.wallSnapMaxAngle;
     }
 
@@ -79,13 +76,15 @@ public class PlayerState_Wallrun : PlayerState_Base
             isWallOnTheLeft = false;
         animator.SetBool(isWallOnTheLeftAnimName, isWallOnTheLeft);
 
-        // animator.GetCurrentAnimatorClipInfo(0).
         previousNormal = hit.normal;
         wallDestination = hit.point + (playerModel.position - hit.point).normalized * agent.movementData.playerRadius;
         // compensate difference in Y position
         wallDestination -= playerModel.localPosition;
         agent.transform.DOMove(wallDestination, agent.movementData.wallSnapTime)
             .OnComplete(() => isSnapFinished = true);
+
+        currentSpeed = rigidbody.velocity.magnitude;
+        DOTween.To(() => currentSpeed, x => currentSpeed = x, speed, .5f);
     }
 
     public override void Update(PlayerStateAgent agent)
@@ -143,7 +142,7 @@ public class PlayerState_Wallrun : PlayerState_Base
             playerModel.RotateInDirectionOnYAxis(rotateToWallDirection, rotationSpeed);
         }
         float input = Mathf.CeilToInt(UnityLegacy.InputVertical());
-        rigidbody.velocity = force * input + playerModel.forward * input * (speed + additionalSpeed);
+        rigidbody.velocity = force * input + playerModel.forward * input * (currentSpeed);
         rotateToWallDirection = Vector3.zero;
     }
 

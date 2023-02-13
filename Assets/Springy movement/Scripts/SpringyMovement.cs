@@ -54,12 +54,12 @@ public class SpringyMovement : ImprovedMonoBehaviour
     {
         return new Quaternion(input.x * scalar, input.y * scalar, input.z * scalar, input.w * scalar);
     }
-
+    // TODO redo mask property
     private void Float()
     {
         Color hitDebugColor = Color.red;
         Ray ray = new Ray(transform.position, transform.up * -1);
-        if (Physics.Raycast(ray, out RaycastHit hit, rayLength))
+        if (Physics.Raycast(ray, out RaycastHit hit, rayLength) && hit.collider.isTrigger == false)
         {
             hitDebugColor = Color.green;
 

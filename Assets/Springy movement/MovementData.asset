@@ -20,11 +20,12 @@ MonoBehaviour:
   movementSpeed: 7
   rotationSpeed: 720
   playerDesiredFloatHeight: 2
+  wallrunSpeed: 10
   distanceToDetectWall: 1.5
   distanceToWallOnRun: 0.2
   stickToWallPower: 200
   maxTime: 5
-  additionalSpeed: 2
+  additionalSpeed: 3
   wallSnapTime: 0.15
   wallSnapMaxAngle: 30
   delayForNextWall: 0.5
@@ -32,7 +33,7 @@ MonoBehaviour:
   playerRadius: 0.2
   layerRails: 3
   railsMovementOffset: 0.25
-  railsMovementSpeed: 8
+  railsMovementSpeed: 10
   delayForRailsState: 0.4
   animator: {fileID: 4256373129300248915, guid: b11b024cb1d9e8c4dbe2c2de6cecfca7, type: 3}
   jumpingUp: Jumping Up

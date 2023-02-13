@@ -18,6 +18,7 @@ public class MovementData : ScriptableObject
     [Foldout("Movement"), SerializeField] internal float rotationSpeed = 10f;
     [Foldout("Movement"), SerializeField] internal float playerDesiredFloatHeight = 2f;
 
+    [Foldout("Wallrun"), SerializeField] internal float wallrunSpeed = 10;
     [Foldout("Wallrun"), SerializeField] internal float distanceToDetectWall = .5f;
     [Foldout("Wallrun"), SerializeField] internal float distanceToWallOnRun = .5f;
     [Foldout("Wallrun"), SerializeField] internal float stickToWallPower = 50f;

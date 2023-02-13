@@ -27,7 +27,6 @@ public class PlayerState_InAir : PlayerState_Walk
     protected override void Init(PlayerStateAgent agent)
     {
         base.Init(agent);
-        Debug.Log($"Init: {System.Enum.GetName(typeof(PlayerStateID), GetID())}");
         MovementData movementData = agent.movementData;
         playerModel = agent.playerModel;
         playerRadius = movementData.playerRadius;
