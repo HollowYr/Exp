@@ -4,12 +4,15 @@ using NaughtyAttributes;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
+using Cinemachine;
 
 [CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/MovementData", order = 1)]
 public class MovementData : ScriptableObject
 {
     [SerializeField] private Transform player;
+
     [SerializeField] internal readonly float gravity = 49f;
+    [Foldout("Movement"), SerializeField] internal float defaultFOV = 60f;
     [Foldout("Movement"), SerializeField] internal float jumpHeight = 3f;
     [Foldout("Movement"), SerializeField] internal float jumpUpForce = 10f;
     [Foldout("Movement"), SerializeField] internal float jumpSideForce = 30f;
@@ -19,6 +22,7 @@ public class MovementData : ScriptableObject
     [Foldout("Movement"), SerializeField] internal float playerDesiredFloatHeight = 2f;
 
     [Foldout("Wallrun"), SerializeField] internal float wallrunSpeed = 10;
+    [Foldout("Wallrun"), SerializeField] internal float wallrunFOV = 10;
     [Foldout("Wallrun"), SerializeField] internal float distanceToDetectWall = .5f;
     [Foldout("Wallrun"), SerializeField] internal float distanceToWallOnRun = .5f;
     [Foldout("Wallrun"), SerializeField] internal float stickToWallPower = 50f;
@@ -32,6 +36,7 @@ public class MovementData : ScriptableObject
     [Foldout("Player"), SerializeField] internal float playerRadius = 1f;
     [Foldout("GrindRails"), SerializeField, Layer] internal int layerRails;
     [Foldout("GrindRails"), SerializeField] internal float railsMovementOffset = 1f;
+    [Foldout("GrindRails"), SerializeField] internal float railsFOV = 1f;
     [Foldout("GrindRails"), SerializeField] internal float railsMovementSpeed = 7f;
     [Foldout("GrindRails"), SerializeField] internal float delayForRailsState = 1f;
 
@@ -78,4 +83,8 @@ public class MovementData : ScriptableObject
         animator = player.GetComponentInChildren<Animator>();
         jumpUpForce = Mathf.Sqrt(jumpHeight * 2 * gravity);
     }
+
+    public void WallrunChangeFOV(CinemachineVirtualCamera cmVCamera) => cmVCamera.ChangeFOV(wallrunFOV, 1f);
+    public void RailGrindChangeFOV(CinemachineVirtualCamera cmVCamera) => cmVCamera.ChangeFOV(railsFOV, 1f);
+    public void ResetFOV(CinemachineVirtualCamera cmVCamera) => cmVCamera.ChangeFOV(defaultFOV, 1f);
 }

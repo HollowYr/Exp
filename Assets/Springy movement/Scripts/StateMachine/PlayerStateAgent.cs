@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
 public class PlayerStateAgent : ImprovedMonoBehaviour
@@ -11,6 +12,8 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
     [SerializeField] internal PlayerStateMachine stateMachine;
     [SerializeField] internal Animator animator;
     [SerializeField] private PlayerStateID initialState;
+    private CameraShake cameraShake;
+    internal CinemachineVirtualCamera cmVCamera;
     internal Rigidbody rigidbody;
     private CapsuleCollider collider;
     private IsGrounded isGrounded;
@@ -22,6 +25,8 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
         collider = GetComponentInChildren<CapsuleCollider>();
         rigidbody = GetComponent<Rigidbody>();
         isGrounded = GetComponent<IsGrounded>();
+        cameraShake = GetComponent<CameraShake>();
+        cmVCamera = cameraShake.currentCamera;
 
         stateMachine = new PlayerStateMachine(this);
         stateMachine.RegisterState(new PlayerState_Idle());
@@ -36,6 +41,7 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
             if (isGroundedState == b || allowGroundedStateChange == false) return;
             isGroundedState = b;
 
+            if (b && rigidbody.velocity.y < -1f) cameraShake.DoCameraShake();
             // if (b)
             // {
             //     Debug.Log(maxY);
@@ -71,6 +77,12 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
         movementDirection = movementDirection.normalized;
         return movementDirection;
     }
+
+    // public void ChangeFOV(float changeDuration, float )
+    // {
+
+    // }
+
     public bool GetIsGrounded() => isGroundedState;
     public void ModifyColliderRadius(float newRadius) => collider.radius = newRadius;
     internal void Jump()

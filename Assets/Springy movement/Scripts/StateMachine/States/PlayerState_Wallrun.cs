@@ -83,6 +83,8 @@ public class PlayerState_Wallrun : PlayerState_Base
         agent.transform.DOMove(wallDestination, agent.movementData.wallSnapTime)
             .OnComplete(() => isSnapFinished = true);
 
+        agent.movementData.WallrunChangeFOV(agent.cmVCamera);
+
         currentSpeed = rigidbody.velocity.magnitude;
         DOTween.To(() => currentSpeed, x => currentSpeed = x, speed, .5f);
     }
@@ -158,6 +160,7 @@ public class PlayerState_Wallrun : PlayerState_Base
     {
         agent.ModifyColliderRadius(playerDefaultRadius);
         ResetConstraints();
+        agent.movementData.ResetFOV(agent.cmVCamera);
     }
     private void LockPositionConstraintY()
     {

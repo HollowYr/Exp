@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: MovementData
   m_EditorClassIdentifier: 
   player: {fileID: 4256373129756691894, guid: b11b024cb1d9e8c4dbe2c2de6cecfca7, type: 3}
+  defaultFOV: 60
   jumpHeight: 3.5
   jumpUpForce: 18.52026
   jumpSideForce: 25
@@ -21,6 +22,7 @@ MonoBehaviour:
   rotationSpeed: 720
   playerDesiredFloatHeight: 2
   wallrunSpeed: 10
+  wallrunFOV: 70
   distanceToDetectWall: 1.5
   distanceToWallOnRun: 0.2
   stickToWallPower: 200
@@ -33,6 +35,7 @@ MonoBehaviour:
   playerRadius: 0.2
   layerRails: 3
   railsMovementOffset: 0.25
+  railsFOV: 75
   railsMovementSpeed: 10
   delayForRailsState: 0.4
   animator: {fileID: 4256373129300248915, guid: b11b024cb1d9e8c4dbe2c2de6cecfca7, type: 3}
