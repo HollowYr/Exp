@@ -25,6 +25,7 @@ public class DebugUI : ImprovedMonoBehaviour
 
     void Update()
     {
+        if (rb == null) return;
         speed.text = $"Speed {Math.Round(rb.velocity.magnitude, 2)}";
         state.text = $"State {playerStateAgent.stateMachine.GetCurrentState().ToString()}";
     }

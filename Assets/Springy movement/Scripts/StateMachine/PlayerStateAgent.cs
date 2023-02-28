@@ -41,7 +41,7 @@ public class PlayerStateAgent : ImprovedMonoBehaviour
             if (isGroundedState == b || allowGroundedStateChange == false) return;
             isGroundedState = b;
 
-            if (b && rigidbody.velocity.y < -1f) cameraShake.DoCameraShake();
+            // if (isGroundedState && rigidbody.velocity.y < -1f) cameraShake.DoCameraShake();
             // if (b)
             // {
             //     Debug.Log(maxY);

@@ -5,6 +5,7 @@ using UnityEngine;
 public class IkTest : MonoBehaviour
 {
     [SerializeField] private float IKDistanseToGround = .056f;
+    [SerializeField] private LayerMask layer;
     Animator animator;
     // Start is called before the first frame update
     void Start()
@@ -18,7 +19,7 @@ public class IkTest : MonoBehaviour
         animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
 
         Ray ray = new Ray(animator.GetIKPosition(AvatarIKGoal.LeftFoot) + Vector3.up, Vector3.down);
-        if (Physics.Raycast(ray, out RaycastHit hit, IKDistanseToGround + 1f))
+        if (Physics.Raycast(ray, out RaycastHit hit, IKDistanseToGround + 1f, layer, QueryTriggerInteraction.Ignore))
         {
             //if(hit.transform.tag = "walkable")
             {

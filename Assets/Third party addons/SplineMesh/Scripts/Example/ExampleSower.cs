@@ -87,6 +87,7 @@ namespace SplineMesh
 
         private void ConvertSplineSowerToBezierPath()
         {
+            if (generated.transform.childCount == 0) return;
             Transform[] children = generated.transform.GetAllChildrenArray();
             Transform splineMesh = meshTiling.generated.GetComponentInChildren<MeshCollider>().transform;
             UOUtility.DestroyChildren(splineMesh.gameObject);
@@ -106,7 +107,7 @@ namespace SplineMesh
 
         public void Sow()
         {
-            UOUtility.DestroyChildren(generated);
+            DestroyChildrenImmediate(generated);
 
             UnityEngine.Random.InitState(randomSeed);
             if (spacing + spacingRange <= 0 ||
@@ -146,6 +147,15 @@ namespace SplineMesh
                 go.transform.position += binormal;
 
                 distance += spacing + UnityEngine.Random.Range(0, spacingRange);
+            }
+        }
+
+        public void DestroyChildrenImmediate(GameObject go)
+        {
+            var childList = go.transform.Cast<Transform>().ToList();
+            foreach (Transform childTransform in childList)
+            {
+                DestroyImmediate(childTransform.gameObject);
             }
         }
     }

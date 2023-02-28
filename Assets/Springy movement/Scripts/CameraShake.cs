@@ -19,7 +19,6 @@ public class CameraShake : ImprovedMonoBehaviour
 
     void Start()
     {
-
     }
 
     void Update()

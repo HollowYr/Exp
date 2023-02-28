@@ -1129,6 +1129,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IKDistanseToGround: 0.12
+  layer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &4111380417799092613
 GameObject:
   m_ObjectHideFlags: 0

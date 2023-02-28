@@ -25,6 +25,7 @@ public class PlayerState_RailGrind : PlayerState_Base
     public override PlayerStateID GetID() => PlayerStateID.RailGrind;
     protected override void Init(PlayerStateAgent agent)
     {
+        base.Init(agent);
         MovementData movementData = agent.movementData;
         animator = agent.animator;
         layerRails = 1 << movementData.layerRails;
@@ -62,6 +63,8 @@ public class PlayerState_RailGrind : PlayerState_Base
 
         currentSpeed = rigidbody.velocity.magnitude;
         DOTween.To(() => currentSpeed, x => currentSpeed = x, speed, .5f);
+
+        agent.movementData.RailGrindChangeFOV(agent.cmVCamera);
     }
 
 
@@ -98,5 +101,7 @@ public class PlayerState_RailGrind : PlayerState_Base
         agent.DoAfterTime(0.13f, () => agent.allowGroundedStateChange = true);
         speed = Mathf.Abs(speed);
         agent.rigidbody.velocity += playerModel.forward * speed;
+
+        agent.movementData.ResetFOV(agent.cmVCamera);
     }
 }
